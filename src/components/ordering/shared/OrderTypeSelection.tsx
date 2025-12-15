@@ -60,9 +60,9 @@ export function OrderTypeSelection({ onNextStep }: OrderTypeSelectionProps) {
             </Button>
           </div>
         </div>
-
+{/* 
         <OrderSearch />
-        <ParcelSearch />
+        <ParcelSearch /> */}
       </CardContent>
     </Card>
   )

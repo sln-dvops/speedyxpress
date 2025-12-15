@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import QRCode from "react-qr-code"
-import Barcode from "react-barcode"
+// import Barcode from "react-barcode"
 import type { OrderWithParcels, RecipientDetails } from "@/types/order"
 import type { ParcelDimensions } from "@/types/pricing"
 
@@ -177,7 +177,7 @@ export function WaybillContent({ orderDetails, parcel, recipient }: WaybillConte
           }
         }}
       >
-        <Barcode
+        {/* <Barcode
           value={trackingNumber}
           width={1.5}
           height={35}
@@ -185,7 +185,7 @@ export function WaybillContent({ orderDetails, parcel, recipient }: WaybillConte
           margin={0}
           textPosition="bottom"
           displayValue={true}
-        />
+        /> */}
       </div>
     </div>
   )

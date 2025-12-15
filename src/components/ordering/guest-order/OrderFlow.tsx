@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { OrderTypeSelection } from "@/components/ordering/guest-order/OrderTypeSelection"
+import { OrderTypeSelection } from "@/components/ordering/shared/OrderTypeSelection"
 import { ParcelDimensions } from "@/components/ordering/guest-order/ParcelSize"
 import { DeliveryMethod } from "@/components/ordering/guest-order/DeliveryMethod"
 import { SendFrom } from "@/components/ordering/guest-order/SendFrom"

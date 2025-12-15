@@ -71,9 +71,14 @@ export function Waybill({ orderDetails }: WaybillProps) {
     }
   `
 
+  
+  const currentParcel = orderDetails.parcels[currentWaybillIndex] || orderDetails.parcels[0]
+  const trackingNumber = currentParcel?.short_id || "UNKNOWN"
+
   // Handle printing a single waybill
   const handlePrintSingle = useReactToPrint({
-    documentTitle: `Waybill-${orderDetails.orderNumber || ""}${isBulkOrder ? `-${currentWaybillIndex + 1}` : ""}`,
+    
+documentTitle: `Waybill-${trackingNumber}${isBulkOrder ? `-${currentWaybillIndex + 1}` : ""}`,
     contentRef: singleWaybillRef,
     pageStyle: printStyles,
   })
@@ -105,7 +110,6 @@ export function Waybill({ orderDetails }: WaybillProps) {
   }
 
   const currentRecipient = getCurrentRecipient()
-  const currentParcel = orderDetails.parcels[currentWaybillIndex] || orderDetails.parcels[0]
 
   return (
     <Card className="bg-white shadow-lg">
@@ -248,8 +252,9 @@ export function Waybill({ orderDetails }: WaybillProps) {
         </CardContent>
         <CardFooter className="px-6 py-4 print-hidden">
           <p className="text-sm text-gray-500">
-            Order #{orderDetails.orderNumber || ""} • {new Date().toLocaleDateString()}
-          </p>
+  Tracking #{currentParcel?.short_id || "Pending"} • {new Date().toLocaleDateString()}
+</p>
+
         </CardFooter>
       </div>
     </Card>
