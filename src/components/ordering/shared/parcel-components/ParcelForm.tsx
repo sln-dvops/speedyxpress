@@ -132,11 +132,9 @@ export function ParcelForm({
             <div className="space-y-2">
               <p className="text-sm text-black">
                 <strong>Actual Weight:</strong> {currentParcel.weight.toFixed(2)} kg{" "}
-                <span className="text-xs">({tierInfo.actualWeightTier.name})</span>
               </p>
               <p className="text-sm text-black">
                 <strong>Volumetric Weight:</strong> {volumetricWeight.toFixed(2)} kg{" "}
-                <span className="text-xs">({tierInfo.volumetricWeightTier.name})</span>
               </p>
             </div>
             <div className="border-t border-gray-200 pt-2 mt-2">

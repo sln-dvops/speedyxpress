@@ -11,13 +11,13 @@ export async function getOrderDetails(orderIdOrShortId: string): Promise<OrderWi
     let query = supabase.from("orders").select("*")
 
     // Check if orderIdOrShortId is a short_id or full UUID
-    if (isShortId(orderIdOrShortId)) {
-      // Search by short_id
-      query = query.eq("short_id", orderIdOrShortId)
-    } else {
-      // Search by full UUID
-      query = query.eq("id", orderIdOrShortId)
-    }
+   if (await isUUID(orderIdOrShortId)) {
+  // full UUID
+  query = query.eq("id", orderIdOrShortId)
+} else {
+  // anything else is treated as short_id
+  query = query.eq("short_id", orderIdOrShortId)
+}
 
     // Get the order details
     const { data: order, error: orderError } = await query.single()
@@ -113,4 +113,9 @@ export async function getOrderDetails(orderIdOrShortId: string): Promise<OrderWi
     console.error("Error getting order details:", error)
     return null
   }
+}
+export async function isUUID(value: string): Promise<boolean> {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value
+  )
 }

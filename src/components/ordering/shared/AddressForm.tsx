@@ -3,6 +3,8 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { validateSingaporeAddress, type ValidationResult } from "@/utils/addressValidation"
+import { AddressAutocompleteInput } from "@/components/ordering/shared/AddressAutocompleteInput"
+
 
 export interface AddressFormData {
   name: string
@@ -21,6 +23,7 @@ export interface AddressFormProps {
 }
 
 export function AddressForm({
+  
   initialData = {
     name: "",
     contactNumber: "",
@@ -135,21 +138,40 @@ export function AddressForm({
       </div>
 
       <div className="flex flex-col">
-        <label htmlFor="street" className="mb-1 font-medium">
-          Street Address:
-        </label>
-        <input
-          type="text"
-          id="street"
-          name="street"
-          value={formData.street}
-          onChange={handleChange}
-          className={`border ${validationResult.errors.street ? "border-red-500" : "border-gray-300"} rounded-md p-2`}
-        />
-        {validationResult.errors.street && (
-          <p className="text-red-500 text-sm mt-1">{validationResult.errors.street}</p>
-        )}
-      </div>
+  <label htmlFor="street" className="mb-1 font-medium">
+    Street Address:
+  </label>
+
+  <AddressAutocompleteInput
+    value={formData.street}
+    onChange={(val) => {
+      const updated = { ...formData, street: val }
+      setFormData(updated)
+      onDataChange(updated)
+    }}
+    onSelect={(s) => {
+      const updated = {
+        ...formData,
+        street: s.address,
+        postalCode: s.postalCode,
+      }
+
+      setFormData(updated)
+      onDataChange(updated)
+
+      // Trigger validation immediately after selection
+      const result = validateSingaporeAddress(updated)
+      setValidationResult(result)
+      onValidityChange(result.isValid)
+    }}
+    placeholder="Address"
+  />
+
+  {validationResult.errors.street && (
+    <p className="text-red-500 text-sm mt-1">{validationResult.errors.street}</p>
+  )}
+</div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col">

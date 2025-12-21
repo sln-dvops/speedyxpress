@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { createOrder } from "@/app/actions/ordering/guest-order/payment"
-import { calculateShippingPrice } from "@/types/pricing"
 import type { OrderDetails, PartialOrderDetails } from "@/types/order"
 import type { ParcelDimensions, DeliveryMethod } from "@/types/pricing"
 
@@ -18,6 +17,10 @@ type PaymentProps = {
   selectedDimensions: ParcelDimensions[] | null
   selectedDeliveryMethod: DeliveryMethod | undefined
   clearUnsavedChanges: () => void
+  basePrice: number
+  locationSurcharge: number
+  finalPrice: number
+   isRestricted: boolean
 }
 
 export function Payment({
@@ -26,7 +29,15 @@ export function Payment({
   selectedDimensions,
   selectedDeliveryMethod,
   clearUnsavedChanges,
+  basePrice,
+  locationSurcharge,
+  finalPrice,
+  isRestricted
 }: PaymentProps) {
+const formattedBasePrice = basePrice.toFixed(2)
+const formattedSurcharge = locationSurcharge.toFixed(2)
+const formattedFinalPrice = finalPrice.toFixed(2)
+
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [termsAccepted, setTermsAccepted] = useState(false)
@@ -51,13 +62,6 @@ export function Payment({
     )
   }
 
-  // Calculate total price for all parcels
-  const totalPrice = selectedDimensions.reduce((sum, dimensions) => {
-    return sum + calculateShippingPrice(dimensions, selectedDeliveryMethod)
-  }, 0)
-
-  // Format price for display
-  const formattedPrice = totalPrice.toFixed(2)
 
   // Update the handlePayment function to ensure recipients are passed to createOrder
   const handlePayment = async () => {
@@ -68,7 +72,7 @@ export function Payment({
       // Update order details with final price and delivery method
       const updatedOrderDetails = {
         ...orderDetails,
-        amount: totalPrice,
+        amount: finalPrice,
         deliveryMethod: selectedDeliveryMethod,
       }
 
@@ -110,7 +114,7 @@ export function Payment({
       <CardContent className="p-6 space-y-6">
         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
           <h3 className="text-xl font-bold text-black mb-4">Order Summary</h3>
-
+          
           <div className="space-y-4">
             <div className="flex justify-between">
               <span className="text-gray-600">Sender:</span>
@@ -143,10 +147,30 @@ export function Payment({
               </span>
             </div>
 
-            <div className="border-t border-gray-200 pt-4 flex justify-between items-center">
-              <span className="text-lg text-gray-800">Total Price:</span>
-              <span className="text-2xl font-bold text-black">${formattedPrice}</span>
-            </div>
+            <div className="border-t border-gray-200 pt-4 space-y-2">
+  <div className="flex justify-between">
+    <span className="text-gray-600">Base Delivery</span>
+    <span className="font-medium text-black">${formattedBasePrice}</span>
+  </div>
+
+  {locationSurcharge > 0 && (
+  <div className="flex justify-between">
+    <span className="text-gray-600">Location Surcharge</span>
+    <span className="font-medium text-black">${formattedSurcharge}</span>
+  </div>
+)}
+{isRestricted && (
+  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium mb-3">
+    ⚠ Restricted Area
+  </div>
+)}
+
+  <div className="border-t border-gray-300 pt-2 flex justify-between items-center">
+    <span className="text-lg text-gray-800">Total Price</span>
+    <span className="text-2xl font-bold text-black">${formattedFinalPrice}</span>
+  </div>
+</div>
+
           </div>
         </div>
 

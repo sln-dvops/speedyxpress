@@ -18,6 +18,9 @@ type PaymentProps = {
   selectedDimensions: ParcelDimensions[] | null
   selectedDeliveryMethod: DeliveryMethod | undefined
   clearUnsavedChanges: () => void
+  basePrice: number
+  locationSurcharge: number
+  finalPrice: number
 }
 
 export function Payment({

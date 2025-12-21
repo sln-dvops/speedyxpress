@@ -16,37 +16,93 @@ export interface ParcelDimensions {
 export interface PricingTier {
   name: string // T1, T2, T3, T4
   maxWeight: number // in kg
-  maxVolumetric: number // in kg/cm³
   price: number // in SGD
 }
-
-// Pricing tiers exactly matching the client's table
 export const PRICING_TIERS: PricingTier[] = [
+  { name: "T1", maxWeight: 4, price: 4.5 },
+  { name: "T2", maxWeight: 10, price: 5.8 },
+  { name: "T3", maxWeight: 20, price: 10.3 },
+  { name: "T4", maxWeight: 30, price: 17.4 },
+]
+
+export interface LocationSurcharge {
+  name: string
+  amount: number
+  postalSectors?: number[]
+  areas?: string[]
+}
+export const LOCATION_SURCHARGES: LocationSurcharge[] = [
   {
-    name: "T1",
-    maxWeight: 4, // 0kg ≤ 4kg
-    maxVolumetric: 2, // 0 kg/cm³ ≤ 2kg/cm³
-    price: 4.5, // amended
+    name: "Tier 1",
+    amount: 4,
+    postalSectors: [1,2,3,4,5,6,7,8,22,23,63],
   },
   {
-    name: "T2",
-    maxWeight: 10, // 4kg < weight ≤ 10kg
-    maxVolumetric: 10, // 2 kg/cm³ < volumetric ≤ 10kg/cm³
-    price: 5.8,
+    name: "Tier 2",
+    amount: 6,
+    postalSectors: [9,69],
   },
   {
-    name: "T3",
-    maxWeight: 20, // 10kg < weight ≤ 20kg
-    maxVolumetric: 25, // 10 kg/cm³ < volumetric ≤ 25kg/cm³
-    price: 10.3,
-  },
-  {
-    name: "T4",
-    maxWeight: 30, // 20kg < weight ≤ 30kg
-    maxVolumetric: Number.POSITIVE_INFINITY, // 25kg/cm³ < volumetric
-    price: 17.4,
+    name: "Restricted Area",
+    amount: 15,
+    areas: ["Military", "Airport", "Immigration", "SATs"],
   },
 ]
+export function getPostalSector(postalCode: string): number | null {
+  if (!postalCode || postalCode.length < 2) return null
+  return parseInt(postalCode.substring(0, 2), 10)
+}
+
+
+const RESTRICTED_KEYWORDS = [
+  "camp",
+  "air base",
+  "airbase",
+  "air force",
+  "rsa f",
+  "rsaf",
+  "military",
+  "mindef",
+  "saf",
+  "immigration",
+  "ica",
+  "checkpoint",
+  "sats",
+  "cargo",
+]
+export function isRestrictedArea(
+  street: string,
+  unitNo?: string
+): boolean {
+  const combined = `${street} ${unitNo ?? ""}`.toLowerCase()
+
+  return RESTRICTED_KEYWORDS.some(keyword =>
+    combined.includes(keyword)
+  )
+}
+export function calculateLocationSurcharge(
+  postalCode: string,
+  street?: string,
+  unitNo?: string
+): number {
+  // 1️⃣ Restricted area override
+  if (street && isRestrictedArea(street, unitNo)) {
+    return 15
+  }
+
+  // 2️⃣ Normal postal-sector pricing
+  const sector = getPostalSector(postalCode)
+  if (sector === null) return 0
+
+  for (const s of LOCATION_SURCHARGES) {
+    if (s.postalSectors?.includes(sector)) {
+      return s.amount
+    }
+  }
+
+  return 0
+}
+
 
 export const HAND_TO_HAND_FEE = 2.5
 
@@ -72,47 +128,33 @@ export function calculateVolumetricWeight(length: number, width: number, height:
  */
 export function getPricingTier(dimensions: ParcelDimensions): {
   tier: PricingTier
-  actualWeightTier: PricingTier
-  volumetricWeightTier: PricingTier
+  chargeableWeight: number
   volumetricWeight: number
 } {
   const { weight, length, width, height } = dimensions
 
-  // Calculate volumetric weight
   const volumetricWeight = calculateVolumetricWeight(length, width, height)
+  const chargeableWeight = Math.max(weight, volumetricWeight)
 
-  // Find applicable pricing tier based on actual weight
-  let actualWeightTier = PRICING_TIERS[PRICING_TIERS.length - 1]
-  for (const tier of PRICING_TIERS) {
-    if (weight <= tier.maxWeight) {
-      actualWeightTier = tier
+  let tier = PRICING_TIERS[PRICING_TIERS.length - 1]
+  for (const t of PRICING_TIERS) {
+    if (chargeableWeight <= t.maxWeight) {
+      tier = t
       break
     }
   }
 
-  // Find applicable pricing tier based on volumetric weight
-  let volumetricWeightTier = PRICING_TIERS[PRICING_TIERS.length - 1]
-  for (const tier of PRICING_TIERS) {
-    if (volumetricWeight <= tier.maxVolumetric) {
-      volumetricWeightTier = tier
-      break
-    }
-  }
-
-  // Use the higher tier (the one with the higher price)
-  const tier = actualWeightTier.price > volumetricWeightTier.price ? actualWeightTier : volumetricWeightTier
-
-  // Log the detailed calculation for debugging
   console.log(`Pricing calculation:
-    - Actual weight: ${weight}kg (${actualWeightTier.name})
-    - Volumetric weight: ${volumetricWeight.toFixed(2)}kg (${volumetricWeightTier.name})
-    - Effective tier: ${tier.name}
+    - Actual weight: ${weight}kg
+    - Volumetric weight: ${volumetricWeight.toFixed(2)}kg
+    - Chargeable weight: ${chargeableWeight.toFixed(2)}kg
+    - Tier applied: ${tier.name}
+    - Base price: $${tier.price}
   `)
 
   return {
     tier,
-    actualWeightTier,
-    volumetricWeightTier,
+    chargeableWeight,
     volumetricWeight,
   }
 }
@@ -120,15 +162,15 @@ export function getPricingTier(dimensions: ParcelDimensions): {
 /**
  * Calculate the shipping price based on dimensions and delivery method
  */
-export function calculateShippingPrice(dimensions: ParcelDimensions, deliveryMethod: DeliveryMethod): number {
-  // Get the pricing tier using our single source of truth
+export function calculateShippingPrice(
+  dimensions: ParcelDimensions,
+  deliveryMethod: DeliveryMethod
+): number {
   const { tier } = getPricingTier(dimensions)
-
-  // Add hand-to-hand fee if selected
   const handToHandFee = deliveryMethod === "hand-to-hand" ? HAND_TO_HAND_FEE : 0
-
   return tier.price + handToHandFee
 }
+
 
 /**
  * Determine the pricing tier name (T1, T2, T3, T4) based on parcel dimensions

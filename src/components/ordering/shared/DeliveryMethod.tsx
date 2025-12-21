@@ -57,9 +57,9 @@ export function DeliveryMethod({
     return {
       parcelNumber: index + 1,
       actualWeight: parcel.weight,
-      actualWeightTier: tierInfo.actualWeightTier.name,
+      actualWeightTier: tierInfo.chargeableWeight,
       volumetricWeight,
-      volumetricWeightTier: tierInfo.volumetricWeightTier.name,
+      volumetricWeightTier: tierInfo.volumetricWeight,
       effectiveTier: tierInfo.tier.name,
       basePrice,
       handToHandFee,

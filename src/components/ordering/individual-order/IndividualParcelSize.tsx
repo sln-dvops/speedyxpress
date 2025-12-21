@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import styles from "./ParcelDimensions.module.css"
 
 import { ParcelForm } from "@/components/ordering/shared/parcel-components/ParcelForm"
 import { ParcelList } from "@/components/ordering/shared/parcel-components/ParcelList"
@@ -143,27 +144,37 @@ export function ParcelDimensions({
 
   // Update the ParcelForm component to show different button text based on whether a parcel exists
   return (
-    <Card className="bg-white shadow-lg">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-black">Individual Parcel Details</CardTitle>
-        <Badge variant="outline" className="bg-yellow-100 text-black border-black mt-2">
-          Individual Order
-        </Badge>
-        {parcels.length > 0 && (
-          <div className="flex items-center mt-2">
-            <Badge variant="outline" className="bg-green-100 text-black border-black">
-              Parcel Added
-            </Badge>
-          </div>
-        )}
-      </CardHeader>
+    <Card className={styles.container}>
+
+      <CardHeader className={styles.header}>
+  <CardTitle className={styles.title}>
+    Individual Parcel Details
+  </CardTitle>
+
+  <div className={styles.badges}>
+    <Badge className={styles.orderTypeBadge}>
+      Individual Order
+    </Badge>
+
+    {parcels.length > 0 && (
+      <Badge className={styles.statusBadge}>
+        Parcel Added
+      </Badge>
+    )}
+  </div>
+</CardHeader>
+
       <CardContent className="space-y-6">
-        <div className="bg-yellow-100 p-4 rounded-lg mb-4">
-          <h3 className="font-medium text-black mb-2">Individual Order Information</h3>
-          <p className="text-sm text-gray-600">
-            Please provide the dimensions and weight of your parcel. For individual orders, you can only add one parcel.
-          </p>
-        </div>
+        <div className={styles.infoBox}>
+  <h3 className={styles.infoTitle}>
+    Individual Order Information
+  </h3>
+  <p className={styles.infoText}>
+    Please provide the dimensions and weight of your parcel.
+    For individual orders, you can only add one parcel.
+  </p>
+</div>
+
 
         {/* Parcel Form Component */}
         {(parcels.length === 0 || editingIndex !== null) && (
@@ -186,18 +197,24 @@ export function ParcelDimensions({
         {/* Parcel Summary Component */}
         {parcels.length > 0 && <ParcelSummary parcels={parcels} calculateTotalWeight={calculateTotalWeight} />}
       </CardContent>
-      <CardFooter className="px-6 py-4 flex justify-between">
-        <Button variant="outline" onClick={onPrevStep} className="border-black text-black hover:bg-yellow-100">
-          Back
-        </Button>
-        <Button
-          onClick={handleContinue}
-          className="bg-black hover:bg-black/90 text-yellow-400"
-          disabled={parcels.length === 0}
-        >
-          Continue to Delivery Method
-        </Button>
-      </CardFooter>
+      <CardFooter className={styles.footer}>
+  <Button
+    variant="outline"
+    onClick={onPrevStep}
+    className={styles.backButton}
+  >
+    Back
+  </Button>
+
+  <Button
+    onClick={handleContinue}
+    className={styles.nextButton}
+    disabled={parcels.length === 0}
+  >
+    Continue to Delivery Method
+  </Button>
+</CardFooter>
+
     </Card>
   )
 }
