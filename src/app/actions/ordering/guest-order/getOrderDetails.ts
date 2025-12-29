@@ -4,20 +4,29 @@ import { createClient } from "@/utils/supabase/server"
 import type { OrderWithParcels, RecipientDetails } from "@/types/order"
 import type { ParcelDimensions } from "@/types/pricing"
 import { isShortId } from "@/utils/orderIdUtils"
+import { isUUID } from "@/utils/isUUID"
 
 export async function getOrderDetails(orderIdOrShortId: string): Promise<OrderWithParcels | null> {
   try {
-    const supabase = await createClient()
-    let query = supabase.from("orders").select("*")
+   const supabase = await createClient()
 
-    // Check if orderIdOrShortId is a short_id or full UUID
-   if (await isUUID(orderIdOrShortId)) {
-  // full UUID
-  query = query.eq("id", orderIdOrShortId)
-} else {
-  // anything else is treated as short_id
-  query = query.eq("short_id", orderIdOrShortId)
+const {
+  data: { user },
+} = await supabase.auth.getUser()
+
+if (!user) {
+  return null
 }
+
+let query = supabase.from("orders").select("*")
+
+
+   if (isUUID(orderIdOrShortId)) {
+  query = query.eq("id", orderIdOrShortId).eq("user_id", user.id)
+} else {
+  query = query.eq("short_id", orderIdOrShortId).eq("user_id", user.id)
+}
+
 
     // Get the order details
     const { data: order, error: orderError } = await query.single()
@@ -46,6 +55,10 @@ export async function getOrderDetails(orderIdOrShortId: string): Promise<OrderWi
     if (bulkOrderError) {
       console.error("Error fetching bulk order:", bulkOrderError)
     }
+if (!parcels || parcels.length === 0) {
+  console.error("No parcels found for order:", order.id)
+  return null
+}
 
     // Format the parcels data
     const formattedParcels: ParcelDimensions[] = parcels.map((parcel) => ({
@@ -56,7 +69,7 @@ export async function getOrderDetails(orderIdOrShortId: string): Promise<OrderWi
       effectiveWeight: Math.max(parcel.weight, (parcel.length * parcel.width * parcel.height) / 5000),
       pricingTier: parcel.pricing_tier, // Include the pricing tier
       id: parcel.id, // Include the parcel ID
-      short_id: parcel.short_id, // Include the parcel short_id
+      short_id: order.short_id, 
     }))
 
     // Format recipient details for bulk orders
@@ -113,9 +126,4 @@ export async function getOrderDetails(orderIdOrShortId: string): Promise<OrderWi
     console.error("Error getting order details:", error)
     return null
   }
-}
-export async function isUUID(value: string): Promise<boolean> {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    value
-  )
 }

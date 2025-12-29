@@ -1,12 +1,16 @@
-import type { Metadata } from "next"
-import { OrderFlow } from "@/components/ordering/OrderFlow"
+import { redirect } from "next/navigation"
+import { createClient } from "@/utils/supabase/server"
 
-export const metadata: Metadata = {
-  title: "Speedy Xpress: Create a delivery order",
-  description: "Create a one-time delivery order with Speedy Xpress",
+export default async function HomePage() {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    redirect("/booking")
+  }
+
+  redirect("/login")
 }
-
-export default function OrderPage() {
-  return <OrderFlow />
-}
-

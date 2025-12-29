@@ -7,7 +7,6 @@ import { Upload, FileText, AlertCircle, Check, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import styles from "./CsvUploader.module.css"
 
 import type { ParcelDimensions } from "@/types/pricing"
 import type { RecipientDetails } from "@/types/order"
@@ -76,7 +75,6 @@ export function CsvUploader({ setParcels, setRecipients, isValidDimensions }: Cs
 
     reader.readAsText(file)
   }
-  const [isDragging, setIsDragging] = useState(false)
 
   const parseCsv = (csvText: string): { parsedParcels: ParcelDimensions[]; parsedRecipients: RecipientDetails[] } => {
     // Split by lines and remove empty lines
@@ -155,7 +153,8 @@ export function CsvUploader({ setParcels, setRecipients, isValidDimensions }: Cs
         weight,
         length,
         width,
-        height,}
+        height,
+      }
 
       const recipient: RecipientDetails = {
         name: values[nameIndex],
@@ -191,108 +190,33 @@ export function CsvUploader({ setParcels, setRecipients, isValidDimensions }: Cs
   const handleCsvButtonClick = () => {
     fileInputRef.current?.click()
   }
-  const handleReset = () => {
-  // Clear uploader UI state
-  setCsvUploadStatus("idle")
-  setCsvErrorMessage("")
-  setUploadedParcelCount(0)
-
-  // 🔴 Clear actual booking data
-  setParcels([])
-  setRecipients([])
-
-  // Reset file input
-  if (fileInputRef.current) {
-    fileInputRef.current.value = ""
-  }
-  
-}
 
   // Use the API endpoint instead of direct URL to enable rate limiting
   const templateFilePath = "/api/templates/csv"
 
   return (
-    <div
-  className={`${styles.wrapper} ${isDragging ? styles.dragActive : ""}`}
-  onDragOver={(e) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }}
-  onDragLeave={() => setIsDragging(false)}
-  onDrop={(e) => {
-    e.preventDefault()
-    setIsDragging(false)
-    const file = e.dataTransfer.files?.[0]
-    if (file && fileInputRef.current) {
-      const dt = new DataTransfer()
-      dt.items.add(file)
-      fileInputRef.current.files = dt.files
-      fileInputRef.current.dispatchEvent(new Event("change", { bubbles: true }))
-    }
-  }}
->
-<div className={styles.header}>
-  <h3 className={styles.title}>Bulk Upload Parcels & Recipients</h3>
-  <p className={styles.description}>
-    Drag & drop a CSV file  with parcel details and recipient information. The CSV must include columns for weight, length, width, height, name, contactNumber, email, street, unitNo, and postalCode.
-  </p>
-</div>
+    <div className="border border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
+      
 
-      <div className={styles.dropZone} onClick={handleCsvButtonClick}>
-  <Upload className={styles.dropIcon} />
-  <p className={styles.dropText}>
-    Drop your CSV file here or <strong>click to upload</strong>
-  </p>
-  <p className={styles.dropHint}>CSV only · Max 30kg · 150cm per side</p>
-</div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <FileText className="h-4 w-4 text-gray-500" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-xs">
+                CSV Format Example:
+                <br />
+                5,30,20,15,John Doe,12345678,john@example.com,123 Main St,#01-01,123456
+                <br />
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
 
-<input
-  type="file"
-  ref={fileInputRef}
-  accept=".csv"
-  className="hidden"
-  onChange={handleCsvUpload}
-/>
-
-<div className={styles.actions}>
-  <Button variant="outline" asChild>
-    <a href={templateFilePath} download="parcel_and_recipient_template.csv">
-      <Download className="mr-2 h-4 w-4" />
-      Download Template
-    </a>
-  </Button>
-
-  {(csvUploadStatus === "success" || csvUploadStatus === "error") && (
-    <Button
-      variant="outline"
-      className={styles.resetBtn}
-      onClick={handleReset}
-    >
-      Cancel
-    </Button>
-  )}
-</div>
-
-
-      {csvUploadStatus === "success" && (
-        <Alert className="mt-3 bg-green-50 border-green-200">
-          <Check className="h-4 w-4 text-green-600" />
-          <AlertTitle className="text-green-600">Success</AlertTitle>
-          <AlertDescription className="text-green-600">
-            {uploadedParcelCount} {uploadedParcelCount === 1 ? "parcel" : "parcels"} with recipient details successfully
-            imported.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {csvUploadStatus === "error" && (
-        <Alert className="mt-3 bg-red-50 border-red-200">
-          <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertTitle className="text-red-600">Error</AlertTitle>
-          <AlertDescription className="text-red-600">{csvErrorMessage}</AlertDescription>
-        </Alert>
-      )}
-    </div>
   )
 }
 

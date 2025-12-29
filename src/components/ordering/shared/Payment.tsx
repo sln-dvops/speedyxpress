@@ -20,7 +20,6 @@ type PaymentProps = {
   basePrice: number
   locationSurcharge: number
   finalPrice: number
-   isRestricted: boolean
 }
 
 export function Payment({
@@ -32,7 +31,6 @@ export function Payment({
   basePrice,
   locationSurcharge,
   finalPrice,
-  isRestricted
 }: PaymentProps) {
 const formattedBasePrice = basePrice.toFixed(2)
 const formattedSurcharge = locationSurcharge.toFixed(2)
@@ -157,11 +155,6 @@ const formattedFinalPrice = finalPrice.toFixed(2)
   <div className="flex justify-between">
     <span className="text-gray-600">Location Surcharge</span>
     <span className="font-medium text-black">${formattedSurcharge}</span>
-  </div>
-)}
-{isRestricted && (
-  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium mb-3">
-    ⚠ Restricted Area
   </div>
 )}
 

@@ -1,0 +1,98 @@
+.wrapper {
+  font-family: 'Poppings',sans-serif;
+  border: 2px dashed #cccccc;
+  border-radius: 16px;
+  padding: 24px;
+  background: linear-gradient(180deg, #fafafa 0%, #f9fafb 100%);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.wrapper.dragActive {
+  border-color: #000;
+  background: #fff7cc;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-weight: 300;
+  font-size: 1rem;
+  color: #000;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Drop zone */
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dropZone:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.dropIcon {
+  width: 40px;
+  height: 40px;
+  color: #000;
+}
+
+.dropText {
+  font-size: 0.9rem;
+  color: #000000;
+  text-align: center;
+}
+
+.dropHint {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.resetBtn {
+  color: #991b1b;
+  border-color: #ef4444;
+}
+
+.resetBtn:hover {
+  background: #fee2e2;
+}
+
+/* Status */
+.success {
+  margin-top: 16px;
+  background: linear-gradient(180deg, #ecfdf5 0%, #bbf7d0 100%);
+  border: 1px solid #86efac;
+}
+
+.error {
+  margin-top: 16px;
+  background: linear-gradient(180deg, #fef2f2 0%, #fecaca 100%);
+  border: 1px solid #fca5a5;
+}

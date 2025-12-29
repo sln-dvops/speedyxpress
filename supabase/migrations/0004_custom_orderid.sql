@@ -2,7 +2,7 @@
 CREATE OR REPLACE FUNCTION extract_last_12_chars(uuid UUID) 
 RETURNS TEXT AS $$
 BEGIN
-  RETURN 'SPDY' || RIGHT(uuid::text, 12);
+  RETURN 'SPD' || RIGHT(uuid::text, 12);
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 

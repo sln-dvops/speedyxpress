@@ -61,6 +61,13 @@ export async function createDetrackOrder(
       console.error("Error fetching order:", orderError)
       return { success: false, message: `Order not found: ${orderError?.message || "Unknown error"}` }
     }
+    if (!orderData.short_id) {
+  return {
+    success: false,
+    message: "Order is missing tracking ID",
+  }
+}
+
 
     // Get the full UUID for database operations
     const fullOrderId = orderData.id
@@ -99,7 +106,6 @@ export async function createDetrackOrder(
       // Use the functions from pricing.ts for calculations
       const volumetricWeight = calculateVolumetricWeight(parcel.length, parcel.width, parcel.height)
 
-      // Get the pricing tier information (which includes effectiveWeight)
       const tierInfo = getPricingTier({
         weight: parcel.weight,
         length: parcel.length,
@@ -109,7 +115,7 @@ export async function createDetrackOrder(
 
       return {
         id: parcel.id,
-        short_id: parcel.short_id, // Include short_id in the parcel data
+        short_id: orderData.short_id, // Include short_id in the parcel data
         weight: parcel.weight,
         length: parcel.length,
         width: parcel.width,
@@ -193,7 +199,7 @@ export async function createDetrackOrder(
         const parcelOrder = {
           ...order,
           // Use the parcel's short_id as the order number for Detrack
-          orderNumber: parcel.short_id || `SPDY${parcel.id.slice(-12)}`,
+          orderNumber: orderData.short_id,
           // Use this specific parcel's recipient details
           recipientName: parcel.recipient_name,
           recipientAddress: parcel.recipient_address,
@@ -214,8 +220,8 @@ export async function createDetrackOrder(
         detrackJob.start_date = formattedDate
 
         // Use the parcel's short_id as the DO number for Detrack
-        detrackJob.do_number = parcel.short_id || `SPDY${parcel.id.slice(-12)}`
-        detrackJob.tracking_number = parcel.short_id || `SPDY${parcel.id.slice(-12)}`
+        detrackJob.do_number = orderData.short_id
+        detrackJob.tracking_number = orderData.short_id
 
         // Add reference to the parent order
         detrackJob.order_number = orderId // Use short_id for external references
@@ -329,7 +335,7 @@ export async function createDetrackOrder(
 
       // Get the first parcel's short_id to use as tracking number
       const firstParcel = parcelsData[0]
-      const trackingNumber = firstParcel.short_id || `SPDY${firstParcel.id.slice(-12)}`
+      const trackingNumber = orderData.short_id
 
       // Create a modified order object with the tracking number and parcel ID as order number
       const orderWithTracking = {

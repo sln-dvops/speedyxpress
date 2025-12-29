@@ -10,7 +10,6 @@ import { Payment } from "@/components/ordering/shared/Payment";
 import { calculateShippingPrice } from "@/types/pricing";
 import { calculateLocationSurcharge } from "@/types/pricing";
 import { useEffect, useMemo } from "react";
-import { isRestrictedArea } from "@/types/pricing"
 
 import type {
   ParcelDimensions as ParcelDimensionsType,
@@ -142,12 +141,6 @@ export function IndividualOrderFlow({
   ]);
 
   const finalPrice = basePrice + locationSurcharge;
-const isRestricted = useMemo(() => {
-  return isRestrictedArea(
-    recipientFormData.street,
-    recipientFormData.unitNo
-  )
-}, [recipientFormData.street, recipientFormData.unitNo])
 
   return (
     <>
@@ -243,7 +236,6 @@ const isRestricted = useMemo(() => {
               basePrice={basePrice}
               locationSurcharge={locationSurcharge}
               finalPrice={finalPrice}
-              isRestricted={isRestricted}
               clearUnsavedChanges={() => {}}
             />
           </motion.div>

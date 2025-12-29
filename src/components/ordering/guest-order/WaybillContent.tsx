@@ -23,8 +23,10 @@ export function WaybillContent({ orderDetails, parcel, recipient }: WaybillConte
   const recipientContact = recipient ? recipient.contactNumber : orderDetails.recipientContactNumber
 
   // Change the trackingNumber generation to use parcel.short_id instead of orderDetails.shortId
-  const trackingNumber =
-    parcel.short_id || parcel.id?.slice(-12) || orderDetails.shortId || orderDetails.orderNumber.slice(-12)
+  const trackingNumber = parcel.short_id ?? orderDetails.shortId
+  if (!trackingNumber) {
+  throw new Error("Missing tracking number for waybill")
+}
 
   // Get the pricing tier from the parcel or recipient
   const pricingTier = parcel.pricingTier || recipient?.pricingTier || "T1"

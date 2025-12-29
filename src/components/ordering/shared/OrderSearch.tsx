@@ -62,7 +62,7 @@ export function OrderSearch() {
       <div className="flex gap-2">
         <div className="flex-1">
           <Input
-            placeholder="Enter order number (e.g., SPDY6186e845c23f)"
+            placeholder="Enter order number (e.g., SPD6186e845c23f)"
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
             className="border-black"

@@ -7,6 +7,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
+
+import styles from "./FormProgress.module.css"
+
 import {
   Dialog,
   DialogContent,
@@ -91,16 +94,18 @@ export function DeliveryMethod({
   }
 
   return (
-    <Card className="bg-white shadow-lg">
+   <Card className={`${styles.card} bg-white shadow-lg`}>
+
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-black">Delivery Method</CardTitle>
+        <CardTitle className={`text-2xl text-black ${styles.title}`}>
+Delivery Method</CardTitle>
         {isBulkOrder && (
           <Badge variant="outline" className="bg-yellow-200 text-black border-black mt-2">
             Bulk Order ({totalParcels} Parcels)
           </Badge>
         )}
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="">
         <div>
           <h3 className="font-medium text-lg text-black mb-4">Choose Your Delivery Method</h3>
           <RadioGroup
@@ -108,16 +113,18 @@ export function DeliveryMethod({
             onValueChange={(value) => setSelectedDeliveryMethod(value as DeliveryMethodType)}
             className="grid gap-4"
           >
-            <Label
-              className={`border border-black rounded-lg p-4 cursor-pointer hover:bg-yellow-100 ${
-                selectedDeliveryMethod === "atl" ? "bg-yellow-200" : ""
-              }`}
-            >
+           <Label
+  className={`${styles.methodOption} ${
+    selectedDeliveryMethod === "atl" ? styles.methodSelected : ""
+  }`}
+>
+
               <RadioGroupItem value="atl" className="sr-only" />
-              <div className="grid grid-cols-[1fr,auto] gap-8 items-center">
+              <div className="grid grid-cols-[1fr,auto] gap-3 items-center">
                 <div>
                   <p className="font-medium text-black">Authorized to Leave (ATL)</p>
-                  <p className="text-sm text-gray-600">Parcel will be left at a safe location</p>
+                  <br></br>
+                  <p className="text-sm text-black-600">Parcel will be left at a safe location</p>
                 </div>
                 <Badge
                   variant="outline"
@@ -129,15 +136,17 @@ export function DeliveryMethod({
             </Label>
 
             <Label
-              className={`border border-black rounded-lg p-4 cursor-pointer hover:bg-yellow-100 ${
-                selectedDeliveryMethod === "hand-to-hand" ? "bg-yellow-200" : ""
-              }`}
-            >
+  className={`${styles.methodOption} ${
+    selectedDeliveryMethod === "hand-to-hand" ? styles.methodSelected : ""
+  }`}
+>
+
               <RadioGroupItem value="hand-to-hand" className="sr-only" />
-              <div className="grid grid-cols-[1fr,auto] gap-8 items-center">
+              <div className="grid grid-cols-[1fr,auto] gap-3 items-center">
                 <div>
                   <p className="font-medium text-black">Hand to Hand</p>
-                  <p className="text-sm text-gray-600">Parcel will be handed directly to recipient</p>
+                  <br></br>
+                  <p className="text-sm text-black-600">Parcel will be handed directly to recipient</p>
                 </div>
                 <Badge
                   variant="outline"
@@ -224,20 +233,21 @@ export function DeliveryMethod({
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-2 border-t border-gray-200">
+                    <div className={styles.totalBox}>
+
                       <div className="flex justify-between items-center">
                         <p className="font-medium">Base Price:</p>
-                        <p className="text-lg font-semibold">${detail.basePrice.toFixed(2)}</p>
+                        <p className="text-lg ">${detail.basePrice.toFixed(2)}</p>
                       </div>
                       {selectedDeliveryMethod === "hand-to-hand" && (
                         <div className="flex justify-between items-center mt-1">
                           <p className="font-medium">Hand-to-Hand Fee:</p>
-                          <p className="text-lg font-semibold text-green-600">+${detail.handToHandFee.toFixed(2)}</p>
+                          <p className="text-lg text-green-600">+${detail.handToHandFee.toFixed(2)}</p>
                         </div>
                       )}
                       <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
                         <p className="font-medium">Total Parcel Price:</p>
-                        <p className="text-xl font-bold text-black">${detail.totalPrice.toFixed(2)}</p>
+                        <p className="text-lg text-black">${detail.totalPrice.toFixed(2)}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -247,22 +257,22 @@ export function DeliveryMethod({
           )}
         </div>
 
-        <div className="mt-4 p-4 bg-green-100 rounded-lg">
+       <div className={styles.totalBox1}>
           <div className="flex justify-between items-center">
-            <p className="text-lg font-semibold text-black">Base Price:</p>
-            <p className="text-xl font-bold text-black">${totalBasePrice.toFixed(2)}</p>
+            <p className="text-lg text-black">Base Price:</p>
+            <p className="text-lg text-black">${totalBasePrice.toFixed(2)}</p>
           </div>
           {selectedDeliveryMethod === "hand-to-hand" && (
             <div className="flex justify-between items-center mt-2">
-              <p className="text-lg font-semibold text-black">
+              <p className="text-lg text-black">
                 Hand-to-Hand Fee (${HAND_TO_HAND_FEE.toFixed(2)} × {parcelDetails.length}):
               </p>
-              <p className="text-xl font-bold text-green-600">+${totalHandToHandFee.toFixed(2)}</p>
+              <p className="text-lg text-green-600">+${totalHandToHandFee.toFixed(2)}</p>
             </div>
           )}
           <div className="flex justify-between items-center mt-4 pt-2 border-t border-gray-300">
-            <p className="text-xl font-semibold text-black">Total Price:</p>
-            <p className="text-2xl font-bold text-black">${totalPrice.toFixed(2)}</p>
+            <p className="text-lg text-black">Total Price:</p>
+            <p className="text-lg text-black">${totalPrice.toFixed(2)}</p>
           </div>
         </div>
 

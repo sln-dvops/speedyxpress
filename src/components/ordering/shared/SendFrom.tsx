@@ -31,14 +31,13 @@ export function SendFrom({ onPrevStep, onNextStep, formData, updateFormData }: S
   return (
     <Card className="bg-white shadow-lg">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-black">Sender Details</CardTitle>
+        <CardTitle className="text-2xl font-bold text-black">Sender Address</CardTitle>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent >
         <AddressForm
           initialData={formData}
           onDataChange={updateFormData}
           onValidityChange={handleFormValidityChange}
-          title="Sender Information"
         />
       </CardContent>
       <CardFooter className="px-6 py-4 flex justify-between">

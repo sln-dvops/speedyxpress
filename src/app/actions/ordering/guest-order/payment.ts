@@ -1,6 +1,5 @@
 "use server";
-
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/server"
 import { createHitPayRequestBody, HITPAY_API_ENDPOINT } from "@/config/hitpay";
 import type {
   OrderDetails,
@@ -9,15 +8,7 @@ import type {
 } from "@/types/order";
 import type { ParcelDimensions } from "@/types/pricing";
 import { determinePricingTier, calculateShippingPrice } from "@/types/pricing";
-
-// Create a Supabase client with the service role key for admin operations
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: { persistSession: false },
-  }
-);
+import { generateTrackingId } from "@/utils/orderIdUtils";
 
 // Update the createOrder function to handle recipients properly
 export async function createOrder(
@@ -25,6 +16,21 @@ export async function createOrder(
   parcels: ParcelDimensions[],
   recipients?: RecipientDetails[]
 ) {
+
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
+
+  if (userError || !user) {
+    throw new Error("User not authenticated")
+  }
+
+  // user.id is now guaranteed
+  const userId = user.id
+
   try {
     console.log("Creating order with the following details:");
     console.log("Order Details:", JSON.stringify(orderDetails, null, 2));
@@ -71,11 +77,13 @@ export async function createOrder(
 
     // Use the server-calculated price for the order
     const finalAmount = serverAmount;
-
+    const trackingId = generateTrackingId();
     // 1. Create the main order record
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
       .insert({
+        user_id: userId,
+        short_id: trackingId,
         sender_name: orderDetails.senderName,
         sender_address: orderDetails.senderAddress,
         sender_contact_number: orderDetails.senderContactNumber,
@@ -85,7 +93,7 @@ export async function createOrder(
         status: "pending",
         is_bulk_order: orderDetails.isBulkOrder || false,
       })
-      .select("id")
+      .select("id,short_id")
       .single();
 
     if (orderError) {
@@ -95,20 +103,7 @@ export async function createOrder(
 
     const orderId = orderData.id;
     console.log("Generated order ID:", orderId);
-
-    // Fetch the short_id for this order
-    const { data: orderWithShortId, error: shortIdError } = await supabase
-      .from("orders")
-      .select("short_id")
-      .eq("id", orderId)
-      .single();
-
-    if (shortIdError) {
-      console.error("Error fetching short_id:", shortIdError);
-      throw new Error(`Failed to fetch short_id: ${shortIdError.message}`);
-    }
-
-    const orderShortId = orderWithShortId.short_id;
+    const orderShortId = orderData.short_id;
     console.log("Order short ID:", orderShortId);
 
     // 2. If it's a bulk order, create a bulk_orders record

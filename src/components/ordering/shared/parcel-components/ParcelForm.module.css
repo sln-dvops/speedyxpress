@@ -1,0 +1,95 @@
+
+/* Parcel Form Layout */
+.parcel-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .parcel-form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.parcel-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.parcel-label {
+  font-size: 1rem;
+  color: #000;
+  display: flex;
+  align-items: center;
+}
+
+.parcel-label span {
+  margin-right: 4px;
+}
+
+.parcel-input {
+  border: 1px solid #000;
+}
+
+.parcel-dimension-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.parcel-hint {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.parcel-button {
+  width: 100%;
+  background: #000;
+  color: #ffce1b;
+  margin-top: 1rem;
+}
+
+.parcel-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.parcel-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.parcel-image {
+  opacity: 0.8;
+  margin: 0 auto 1rem;
+}
+
+/* Pricing / Info Box */
+.parcel-info {
+  background: #fef3c7;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+.parcel-info p {
+  font-size: 0.875rem;
+  color: #000;
+}
+
+.parcel-info-divider {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+/* Exceeded Limit Warning */
+.parcel-error {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}

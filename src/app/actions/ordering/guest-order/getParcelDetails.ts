@@ -1,83 +1,83 @@
-"use server"
+"use server";
 
-import { createClient } from "@/utils/supabase/server"
-import type { ParcelDimensions } from "@/types/pricing"
-import { isShortId } from "@/utils/orderIdUtils"
+import { createClient } from "@/utils/supabase/server";
+import type { ParcelDimensions } from "@/types/pricing";
+import { isShortId } from "@/utils/orderIdUtils";
 
 export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
   parcel: ParcelDimensions & {
-    id: string
-    short_id?: string
-    status?: string
-    recipient_name: string
-    recipient_address: string
-    recipient_contact_number: string
-    recipient_email: string
-    pricing_tier: string
-    detrack_job_id?: string
-    created_at: string
-  }
+    id: string;
+    short_id?: string;
+    status?: string;
+    recipient_name: string;
+    recipient_address: string;
+    recipient_contact_number: string;
+    recipient_email: string;
+    pricing_tier: string;
+    detrack_job_id?: string;
+    created_at: string;
+
+    // ✅ derived, explicit
+    volumetricWeight: number;
+    effectiveWeight: number;
+  };
   order: {
-    id: string
-    short_id?: string
-    sender_name: string
-    status: string
-    delivery_method: string
-    created_at: string
-  }
+    id: string;
+    short_id?: string;
+    sender_name: string;
+    status: string;
+    delivery_method: string;
+    created_at: string;
+  };
 } | null> {
   try {
-    const supabase = await createClient()
-    let query = supabase.from("parcels").select(`
-      *,
-      orders:order_id (
-        id,
-        short_id,
-        sender_name,
-        status,
-        delivery_method,
-        created_at
-      )
-    `)
+    const supabase = await createClient();
 
-    // Check if parcelIdOrShortId is a short_id or full UUID
+    let query = supabase.from("parcels").select(
+      `
+        *,
+        orders:order_id (
+          id,
+          short_id,
+          sender_name,
+          status,
+          delivery_method,
+          created_at
+        )
+      `
+    );
+
     if (isShortId(parcelIdOrShortId)) {
-      // Search by short_id
-      query = query.eq("short_id", parcelIdOrShortId)
+      query = query.eq("short_id", parcelIdOrShortId);
     } else {
-      // Search by full UUID
-      query = query.eq("id", parcelIdOrShortId)
+      query = query.eq("id", parcelIdOrShortId);
     }
 
-    // Get the parcel details
-    const { data, error } = await query.single()
+    const { data, error } = await query.single();
 
-    if (error) {
-      console.error(`Error fetching parcel ${parcelIdOrShortId}:`, error)
-      return null
+    if (error || !data) {
+      console.error(`Error fetching parcel ${parcelIdOrShortId}:`, error);
+      return null;
     }
 
-    if (!data) {
-      console.error(`Parcel ${parcelIdOrShortId} not found`)
-      return null
-    }
+    // --- derived weights (single source logic) ---
+    const volumetricWeight = (data.length * data.width * data.height) / 5000;
 
-    // Calculate volumetric weight
-    const volumetricWeight = (data.length * data.width * data.height) / 5000
-    const effectiveWeight = Math.max(data.weight, volumetricWeight)
+    const effectiveWeight = Math.max(data.weight, volumetricWeight);
 
-    // Format the parcel data
     const parcel: ParcelDimensions & {
-      id: string
-      short_id?: string
-      status?: string
-      recipient_name: string
-      recipient_address: string
-      recipient_contact_number: string
-      recipient_email: string
-      pricing_tier: string
-      detrack_job_id?: string
-      created_at: string
+      id: string;
+      short_id?: string;
+      status?: string;
+      recipient_name: string;
+      recipient_address: string;
+      recipient_contact_number: string;
+      recipient_email: string;
+      pricing_tier: string;
+      detrack_job_id?: string;
+      created_at: string;
+      volumetricWeight: number;
+      effectiveWeight: number;
     } = {
       id: data.id,
       short_id: data.short_id,
@@ -85,7 +85,10 @@ export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
       length: data.length,
       width: data.width,
       height: data.height,
-      effectiveWeight: effectiveWeight,
+
+      volumetricWeight,
+      effectiveWeight,
+
       status: data.status,
       recipient_name: data.recipient_name,
       recipient_address: data.recipient_address,
@@ -94,17 +97,14 @@ export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
       pricing_tier: data.pricing_tier,
       detrack_job_id: data.detrack_job_id,
       created_at: data.created_at,
-    }
-
-    // Extract order data
-    const order = data.orders
+    };
 
     return {
       parcel,
-      order,
-    }
+      order: data.orders,
+    };
   } catch (error) {
-    console.error("Error getting parcel details:", error)
-    return null
+    console.error("Error getting parcel details:", error);
+    return null;
   }
 }

@@ -12,22 +12,11 @@ import { ParcelSummary } from "@/components/ordering/shared/parcel-components/Pa
 
 import type { ParcelDimensions } from "@/types/pricing"
 
-// Define ExtendedParcelDimensions
-export interface ExtendedParcelDimensions extends ParcelDimensions {
-  effectiveWeight: number
-}
-
 type ParcelDimensionsProps = {
   onPrevStep: () => void
   onNextStep: () => void
   selectedDimensions: ParcelDimensions[] | null
-  setSelectedDimensions: (dimensions: ExtendedParcelDimensions[]) => void
-}
-
-// Move this function to the top of the file, outside of the component
-const calculateEffectiveWeight = (parcel: ParcelDimensions): number => {
-  const volumetricWeight = (parcel.length * parcel.width * parcel.height) / 5000
-  return Math.max(parcel.weight, volumetricWeight)
+  setSelectedDimensions: (dimensions: ParcelDimensions[]) => void
 }
 
 export function ParcelDimensions({
@@ -41,88 +30,34 @@ export function ParcelDimensions({
     length: 0,
     width: 0,
     height: 0,
-    effectiveWeight: 0, // Initialize with 0
   })
-  const [parcels, setParcels] = useState<ParcelDimensions[]>(() =>
-    selectedDimensions ? selectedDimensions.map((d) => ({ ...d, effectiveWeight: calculateEffectiveWeight(d) })) : [],
+
+  const [parcels, setParcels] = useState<ParcelDimensions[]>(
+    () => selectedDimensions ?? []
   )
+
   const [volumetricWeight, setVolumetricWeight] = useState(0)
   const [effectiveWeight, setEffectiveWeight] = useState(0)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
 
+  // --- Derived weight calculations (UI only) ---
   useEffect(() => {
-    // Calculate volumetric weight
-    const newVolumetricWeight = (currentParcel.length * currentParcel.width * currentParcel.height) / 5000
-    setVolumetricWeight(newVolumetricWeight)
+    const vw =
+      (currentParcel.length * currentParcel.width * currentParcel.height) / 5000
 
-    // Calculate effective weight
-    const newEffectiveWeight = Math.max(currentParcel.weight, newVolumetricWeight)
-    setEffectiveWeight(newEffectiveWeight)
+    setVolumetricWeight(vw)
+    setEffectiveWeight(Math.max(currentParcel.weight, vw))
   }, [currentParcel])
 
-  const handleDimensionChange = (field: keyof ParcelDimensions, value: string) => {
+  const handleDimensionChange = (
+    field: keyof ParcelDimensions,
+    value: string
+  ) => {
     const numValue = Number.parseFloat(value) || 0
-    setCurrentParcel((prev) => {
-      const updatedParcel = { ...prev, [field]: numValue }
-      return {
-        ...updatedParcel,
-        effectiveWeight: calculateEffectiveWeight(updatedParcel),
-      }
-    })
-  }
-
-  // Modify the handleAddParcel function to replace the existing parcel instead of adding a new one
-  const handleAddParcel = () => {
-    if (isValidDimensions(currentParcel)) {
-      if (editingIndex !== null) {
-        // Update existing parcel
-        const updatedParcels = [...parcels]
-        updatedParcels[editingIndex] = currentParcel
-        setParcels(updatedParcels)
-        setEditingIndex(null)
-      } else {
-        // For individual orders, we only want one parcel
-        setParcels([currentParcel])
-      }
-
-      // Reset form for next parcel
-      setCurrentParcel({
-        weight: 0,
-        length: 0,
-        width: 0,
-        height: 0,
-        effectiveWeight: 0,
-      })
-    }
-  }
-
-  const handleEditParcel = (index: number) => {
-    setCurrentParcel(parcels[index])
-    setEditingIndex(index)
-  }
-
-  const handleRemoveParcel = (index: number) => {
-    setParcels([])
-
-    // If we were editing this parcel, reset the form
-    if (editingIndex === index) {
-      setCurrentParcel({
-        weight: 0,
-        length: 0,
-        width: 0,
-        height: 0,
-        effectiveWeight: 0,
-      })
-      setEditingIndex(null)
-    }
-  }
-
-  // Update the handleContinue function
-  const handleContinue = () => {
-    if (parcels.length > 0) {
-      setSelectedDimensions(parcels)
-      onNextStep()
-    }
+    setCurrentParcel((prev) => ({
+      ...prev,
+      [field]: numValue,
+    }))
   }
 
   const isValidDimensions = (dimensions: ParcelDimensions) => {
@@ -138,45 +73,78 @@ export function ParcelDimensions({
     )
   }
 
-  const calculateTotalWeight = () => {
-    return parcels.reduce((total, parcel) => total + parcel.weight, 0)
+  const handleAddParcel = () => {
+    if (!isValidDimensions(currentParcel)) return
+
+    // Single package → always exactly one parcel
+    setParcels([currentParcel])
+    setEditingIndex(null)
+
+    setCurrentParcel({
+      weight: 0,
+      length: 0,
+      width: 0,
+      height: 0,
+    })
   }
 
-  // Update the ParcelForm component to show different button text based on whether a parcel exists
+  const handleEditParcel = (index: number) => {
+    setCurrentParcel(parcels[index])
+    setEditingIndex(index)
+  }
+
+  const handleRemoveParcel = () => {
+    setParcels([])
+    setEditingIndex(null)
+    setCurrentParcel({
+      weight: 0,
+      length: 0,
+      width: 0,
+      height: 0,
+    })
+  }
+
+  const calculateTotalWeight = () =>
+    parcels.reduce((total, parcel) => total + parcel.weight, 0)
+
+  const handleContinue = () => {
+    if (parcels.length === 1) {
+      setSelectedDimensions(parcels)
+      onNextStep()
+    }
+  }
+
   return (
     <Card className={styles.container}>
-
       <CardHeader className={styles.header}>
-  <CardTitle className={styles.title}>
-    Individual Parcel Details
-  </CardTitle>
+        <CardTitle className={styles.title}>
+          Single Package Details
+        </CardTitle>
 
-  <div className={styles.badges}>
-    <Badge className={styles.orderTypeBadge}>
-      Individual Order
-    </Badge>
+        <div className={styles.badges}>
+          <Badge className={styles.orderTypeBadge}>
+            Single Package
+          </Badge>
 
-    {parcels.length > 0 && (
-      <Badge className={styles.statusBadge}>
-        Parcel Added
-      </Badge>
-    )}
-  </div>
-</CardHeader>
+          {parcels.length === 1 && (
+            <Badge className={styles.statusBadge}>
+              Parcel Added
+            </Badge>
+          )}
+        </div>
+      </CardHeader>
 
       <CardContent className="space-y-6">
         <div className={styles.infoBox}>
-  <h3 className={styles.infoTitle}>
-    Individual Order Information
-  </h3>
-  <p className={styles.infoText}>
-    Please provide the dimensions and weight of your parcel.
-    For individual orders, you can only add one parcel.
-  </p>
-</div>
+          <h3 className={styles.infoTitle}>
+            Single Package Information
+          </h3>
+          <p className={styles.infoText}>
+            Please provide the dimensions and weight of your parcel.
+            Only one parcel is allowed for this order.
+          </p>
+        </div>
 
-
-        {/* Parcel Form Component */}
         {(parcels.length === 0 || editingIndex !== null) && (
           <ParcelForm
             currentParcel={currentParcel}
@@ -189,33 +157,39 @@ export function ParcelDimensions({
           />
         )}
 
-        {/* Parcel List Component */}
-        {parcels.length > 0 && (
-          <ParcelList parcels={parcels} handleEditParcel={handleEditParcel} handleRemoveParcel={handleRemoveParcel} />
+        {parcels.length === 1 && (
+          <ParcelList
+            parcels={parcels}
+            handleEditParcel={handleEditParcel}
+            handleRemoveParcel={handleRemoveParcel}
+          />
         )}
 
-        {/* Parcel Summary Component */}
-        {parcels.length > 0 && <ParcelSummary parcels={parcels} calculateTotalWeight={calculateTotalWeight} />}
+        {parcels.length === 1 && (
+          <ParcelSummary
+            parcels={parcels}
+            calculateTotalWeight={calculateTotalWeight}
+          />
+        )}
       </CardContent>
+
       <CardFooter className={styles.footer}>
-  <Button
-    variant="outline"
-    onClick={onPrevStep}
-    className={styles.backButton}
-  >
-    Back
-  </Button>
+        <Button
+          variant="outline"
+          onClick={onPrevStep}
+          className={styles.backButton}
+        >
+          Back
+        </Button>
 
-  <Button
-    onClick={handleContinue}
-    className={styles.nextButton}
-    disabled={parcels.length === 0}
-  >
-    Continue to Delivery Method
-  </Button>
-</CardFooter>
-
+        <Button
+          onClick={handleContinue}
+          className={styles.nextButton}
+          disabled={parcels.length !== 1}
+        >
+          Continue to Delivery Method
+        </Button>
+      </CardFooter>
     </Card>
   )
 }
-

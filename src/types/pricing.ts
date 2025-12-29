@@ -53,44 +53,12 @@ export function getPostalSector(postalCode: string): number | null {
   return parseInt(postalCode.substring(0, 2), 10)
 }
 
-
-const RESTRICTED_KEYWORDS = [
-  "camp",
-  "air base",
-  "airbase",
-  "air force",
-  "rsa f",
-  "rsaf",
-  "military",
-  "mindef",
-  "saf",
-  "immigration",
-  "ica",
-  "checkpoint",
-  "sats",
-  "cargo",
-]
-export function isRestrictedArea(
-  street: string,
-  unitNo?: string
-): boolean {
-  const combined = `${street} ${unitNo ?? ""}`.toLowerCase()
-
-  return RESTRICTED_KEYWORDS.some(keyword =>
-    combined.includes(keyword)
-  )
-}
 export function calculateLocationSurcharge(
   postalCode: string,
   street?: string,
   unitNo?: string
 ): number {
-  // 1️⃣ Restricted area override
-  if (street && isRestrictedArea(street, unitNo)) {
-    return 15
-  }
-
-  // 2️⃣ Normal postal-sector pricing
+  // Normal postal-sector pricing
   const sector = getPostalSector(postalCode)
   if (sector === null) return 0
 

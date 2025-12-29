@@ -60,7 +60,7 @@ export function ParcelSearch() {
       <div className="flex gap-2">
         <div className="flex-1">
           <Input
-            placeholder="Enter parcel number (e.g., SPDY6186e845c23f)"
+            placeholder="Enter parcel number (e.g., SPD6186e845c23f)"
             value={parcelNumber}
             onChange={(e) => setParcelNumber(e.target.value)}
             className="border-black"

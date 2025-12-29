@@ -12,6 +12,8 @@ type Props = {
 
   placeholder?: string
   disabled?: boolean
+  
+  inputClassName?: string
 }
 
 export function AddressAutocompleteInput({
@@ -20,6 +22,7 @@ export function AddressAutocompleteInput({
   onSelect,
   placeholder = "Enter address",
   disabled,
+  inputClassName
 }: Props) {
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -48,13 +51,14 @@ export function AddressAutocompleteInput({
         value={value}
         disabled={disabled}
         onFocus={() => setOpen(true)}
+        placeholder={placeholder}
         onChange={(e) => {
           onChange(e.target.value)
           setOpen(true)
         }}
-        placeholder={placeholder}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/20"
+        className={inputClassName}
       />
+      <span>{placeholder}</span>
 
       {open && (results.length > 0 || loading) && (
         <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-md border bg-white shadow-lg">
