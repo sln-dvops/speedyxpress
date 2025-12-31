@@ -74,6 +74,16 @@ export default function LoginPage() {
           Create an account
         </span>
       </p>
+      <div className="guest-section">
+  <button
+    type="button"
+    className="guest-button"
+    onClick={() => router.push("/booking")}
+  >
+    Continue as guest
+  </button>
+</div>
+
     </div>
   )
 }

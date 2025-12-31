@@ -764,3 +764,47 @@ textarea:-moz-autofill {
     padding: 24px 16px;
   }
 }
+
+.guest-section {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.guest-button {
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.guest-button:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+.create-account-button {
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: #ffc800;
+  color: black;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.05s ease;
+}
+
+.create-account-button:hover {
+  background: #ffc800;
+}
+
+.create-account-button:active {
+  transform: translateY(1px);
+}
+
+.guest-only {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}

@@ -48,42 +48,43 @@ export async function POST(request: NextRequest) {
     console.log(`Processing Detrack update for order ${orderId}: ${status} (${trackingStatus})`)
 
     // Map Detrack status to our order status
-    let orderStatus = "processing" // Default status
+   let deliveryStatus = "processing"
 
-    switch (status) {
-      case "dispatched":
-        orderStatus = "processing"
-        break
-      case "in_progress":
-        orderStatus = "out_for_delivery"
-        break
-      case "completed":
-        orderStatus = "delivered"
-        break
-      case "failed":
-        orderStatus = "delivery_failed"
-        break
-      case "cancelled":
-        orderStatus = "cancelled"
-        break
-    }
+switch (status) {
+  case "dispatched":
+    deliveryStatus = "picked_up"
+    break
+  case "in_progress":
+    deliveryStatus = "on_the_way"
+    break
+  case "completed":
+    deliveryStatus = "delivered"
+    break
+  case "failed":
+    deliveryStatus = "delivery_failed"
+    break
+  case "cancelled":
+    deliveryStatus = "cancelled"
+    break
+}
 
     // Update the order status in our database
     const supabase = await createClient()
     const { error } = await supabase
-      .from("orders")
-      .update({
-        status: orderStatus,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", orderId)
+  .from("orders")
+  .update({
+    delivery_status: deliveryStatus,
+    updated_at: new Date().toISOString(),
+  })
+  .eq("detrack_job_id", orderId)
+
 
     if (error) {
       console.error(`Error updating order ${orderId} status:`, error)
       return NextResponse.json({ error: "Database update failed" }, { status: 500 })
     }
 
-    console.log(`Updated order ${orderId} status to ${orderStatus}`)
+    console.log(`Updated order ${orderId} status to ${deliveryStatus}`)
 
     // If there are item updates, update the corresponding parcels
     if (data.items && Array.isArray(data.items)) {

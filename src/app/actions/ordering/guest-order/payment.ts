@@ -23,13 +23,7 @@ export async function createOrder(
     data: { user },
     error: userError,
   } = await supabase.auth.getUser()
-
-  if (userError || !user) {
-    throw new Error("User not authenticated")
-  }
-
-  // user.id is now guaranteed
-  const userId = user.id
+const userId = user?.id ?? null
 
   try {
     console.log("Creating order with the following details:");
@@ -126,6 +120,7 @@ export async function createOrder(
 
       if (bulkOrderError) {
         console.error("Bulk order creation error:", bulkOrderError);
+        throw new Error(bulkOrderError.message)
         // We'll continue even if this fails - it's not critical
       }
 

@@ -1,26 +1,46 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ParcelDimensions } from "@/components/ordering/bulk-order/BulkParcelSize"
-import { DeliveryMethod } from "@/components/ordering/shared/DeliveryMethod"
-import { SendFrom } from "@/components/ordering/shared/SendFrom"
-import { BulkSendTo } from "@/components/ordering/bulk-order/BulkSendTo"
-import { Payment } from "@/components/ordering/shared/Payment"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ParcelDimensions } from "@/components/ordering/bulk-order/BulkParcelSize";
+import { DeliveryMethod } from "@/components/ordering/shared/DeliveryMethod";
+import { SendFrom } from "@/components/ordering/shared/SendFrom";
+import { BulkSendTo } from "@/components/ordering/bulk-order/BulkSendTo";
+import { Payment } from "@/components/ordering/shared/Payment";
+import { calculateLocationSurcharge } from "@/types/pricing";
 
-import type { ParcelDimensions as ParcelDimensionsType, DeliveryMethod as DeliveryMethodType } from "@/types/pricing"
-import type { OrderDetails, PartialOrderDetails, RecipientDetails } from "@/types/order"
-import type { AddressFormData } from "@/components/ordering/shared/AddressForm"
+import type {
+  ParcelDimensions as ParcelDimensionsType,
+  DeliveryMethod as DeliveryMethodType,
+} from "@/types/pricing";
+import type {
+  OrderDetails,
+  PartialOrderDetails,
+  RecipientDetails,
+} from "@/types/order";
+import type { AddressFormData } from "@/components/ordering/shared/AddressForm";
 
 interface ExtendedAddressFormData extends AddressFormData {
-  recipients?: RecipientDetails[]
+  recipients?: RecipientDetails[];
 }
 
-type Step = 0 | 1 | 2 | 3 | 4
+type Step = 0 | 1 | 2 | 3 | 4;
 
-export function BulkOrderFlow({ onBackToSelection }: { onBackToSelection: () => void }) {
-  const [currentStep, setCurrentStep] = useState<Step>(0)
-  const [selectedDimensions, setSelectedDimensions] = useState<ParcelDimensionsType[] | null>(null)
+export function BulkOrderFlow({
+  onBackToSelection,
+}: {
+  onBackToSelection: () => void;
+}) {
+  const [pricing, setPricing] = useState({
+    basePrice: 0,
+    locationSurcharge: 0,
+    finalPrice: 0,
+  });
+
+  const [currentStep, setCurrentStep] = useState<Step>(0);
+  const [selectedDimensions, setSelectedDimensions] = useState<
+    ParcelDimensionsType[] | null
+  >(null);
   const [orderDetails, setOrderDetails] = useState<PartialOrderDetails>({
     orderNumber: "",
     senderName: "",
@@ -38,7 +58,7 @@ export function BulkOrderFlow({ onBackToSelection }: { onBackToSelection: () => 
     deliveryMethod: undefined,
     isBulkOrder: true,
     recipients: [],
-  })
+  });
   const [senderFormData, setSenderFormData] = useState<AddressFormData>({
     name: "",
     contactNumber: "",
@@ -46,63 +66,77 @@ export function BulkOrderFlow({ onBackToSelection }: { onBackToSelection: () => 
     street: "",
     unitNo: "",
     postalCode: "",
-  })
-  const [recipientFormData, setRecipientFormData] = useState<ExtendedAddressFormData>({
-    name: "",
-    contactNumber: "",
-    email: "",
-    street: "",
-    unitNo: "",
-    postalCode: "",
-    recipients: [],
-  })
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<DeliveryMethodType | undefined>(undefined)
-  const [recipients, setRecipients] = useState<RecipientDetails[]>([])
+  });
+  const [recipientFormData, setRecipientFormData] =
+    useState<ExtendedAddressFormData>({
+      name: "",
+      contactNumber: "",
+      email: "",
+      street: "",
+      unitNo: "",
+      postalCode: "",
+      recipients: [],
+    });
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<
+    DeliveryMethodType | undefined
+  >(undefined);
+  const [recipients, setRecipients] = useState<RecipientDetails[]>([]);
 
   const handleNextStep = () => {
     if (currentStep < 4) {
-      setCurrentStep((prevStep) => (prevStep + 1) as Step)
+      setCurrentStep((prevStep) => (prevStep + 1) as Step);
     }
-  }
+  };
 
   const handlePrevStep = () => {
     if (currentStep > 0) {
-      setCurrentStep((prevStep) => (prevStep - 1) as Step)
+      setCurrentStep((prevStep) => (prevStep - 1) as Step);
     } else {
-      onBackToSelection()
+      onBackToSelection();
     }
-  }
+  };
 
   const updateSenderFormData = (data: AddressFormData) => {
-    setSenderFormData(data)
+    setSenderFormData(data);
     setOrderDetails((prevDetails) => ({
       ...prevDetails,
       senderName: data.name,
       senderAddress: `${data.street}, ${data.unitNo}, ${data.postalCode}`,
       senderContactNumber: data.contactNumber,
       senderEmail: data.email,
-    }))
-  }
+    }));
+  };
 
   const updateRecipientFormData = (data: ExtendedAddressFormData) => {
-    setRecipientFormData(data)
+    setRecipientFormData(data);
+
+    // Calculate location surcharge once for the bulk order
+    const locationSurcharge = calculateLocationSurcharge(
+      data.postalCode,
+      data.street,
+      data.unitNo
+    );
 
     if (data.recipients && data.recipients.length > 0) {
-      setRecipients(data.recipients)
+      setRecipients(data.recipients);
+
       setOrderDetails((prevDetails) => ({
         ...prevDetails,
         recipients: data.recipients,
-      }))
+        recipientPostalCode: data.postalCode,
+        recipientAddress: `${data.street}, ${data.unitNo}, ${data.postalCode}`,
+        locationSurcharge, // ✅ ADD THIS
+      }));
     }
-  }
+  };
 
   const updateRecipients = (newRecipients: RecipientDetails[]) => {
-    setRecipients(newRecipients)
+    setRecipients(newRecipients);
     setOrderDetails((prevDetails) => ({
       ...prevDetails,
       recipients: newRecipients,
-    }))
-  }
+    }));
+  };
 
   return (
     <>
@@ -125,26 +159,32 @@ export function BulkOrderFlow({ onBackToSelection }: { onBackToSelection: () => 
           </motion.div>
         )}
 
-        {currentStep === 1 && selectedDimensions && selectedDimensions.length > 0 && (
-          <motion.div
-            key="delivery-method"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <DeliveryMethod
-              onPrevStep={handlePrevStep}
-              onNextStep={handleNextStep}
-              selectedDimensions={selectedDimensions}
-              isBulkOrder={true}
-              totalParcels={selectedDimensions.length}
-              totalWeight={selectedDimensions.reduce((sum, parcel) => sum + parcel.weight, 0)}
-              selectedDeliveryMethod={selectedDeliveryMethod}
-              setSelectedDeliveryMethod={setSelectedDeliveryMethod}
-            />
-          </motion.div>
-        )}
+        {currentStep === 1 &&
+          selectedDimensions &&
+          selectedDimensions.length > 0 && (
+            <motion.div
+              key="delivery-method"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <DeliveryMethod
+                onPrevStep={handlePrevStep}
+                onNextStep={handleNextStep}
+                selectedDimensions={selectedDimensions}
+                isBulkOrder={true}
+                totalParcels={selectedDimensions.length}
+                totalWeight={selectedDimensions.reduce(
+                  (sum, p) => sum + p.weight,
+                  0
+                )}
+                selectedDeliveryMethod={selectedDeliveryMethod}
+                setSelectedDeliveryMethod={setSelectedDeliveryMethod}
+                onPricingCalculated={setPricing} // ✅ THIS LINE FIXES IT
+              />
+            </motion.div>
+          )}
 
         {currentStep === 2 && (
           <motion.div
@@ -198,11 +238,13 @@ export function BulkOrderFlow({ onBackToSelection }: { onBackToSelection: () => 
               selectedDimensions={selectedDimensions}
               selectedDeliveryMethod={selectedDeliveryMethod}
               clearUnsavedChanges={() => {}}
+              basePrice={pricing.basePrice}
+              locationSurcharge={pricing.locationSurcharge}
+              finalPrice={pricing.finalPrice}
             />
           </motion.div>
         )}
       </AnimatePresence>
     </>
-  )
+  );
 }
-

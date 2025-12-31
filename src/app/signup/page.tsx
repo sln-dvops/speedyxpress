@@ -96,6 +96,16 @@ export default function SignupPage() {
         Already have an account?{" "}
         <span onClick={() => router.push("/login")}>Log in</span>
       </p>
+      <div className="guest-section">
+  <button
+    type="button"
+    className="guest-button"
+    onClick={() => router.push("/booking")}
+  >
+    Continue as guest
+  </button>
+</div>
+
     </div>
   )
 }

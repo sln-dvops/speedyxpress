@@ -15,32 +15,39 @@ export default async function OrderPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
+const isGuest = !user
   return (
     <>
       <header className="order-header">
-        <div className="order-header-inner">
-          <p className="order-greeting">
-            Hi, <span>{user.user_metadata?.display_name}</span>
-          </p>
+  <div className="order-header-inner">
+    {user ? (
+      <>
+        <p className="order-greeting">
+          Hi, <span>{user.user_metadata?.display_name}</span>
+        </p>
 
-          <div className="order-actions">
-            <a href="/dashboard" className="dashboard-link">
-              Dashboard
-            </a>
+        <div className="order-actions">
+          <a href="/dashboard" className="dashboard-link">
+            Dashboard
+          </a>
 
-            <form action={logoutAction}>
-              <button type="submit" className="logout-button">
-                Logout
-              </button>
-            </form>
-          </div>
+          <form action={logoutAction}>
+            <button type="submit" className="logout-button">
+              Logout
+            </button>
+          </form>
         </div>
-      </header>
+      </>
+    ) : (
+      <div className="order-actions guest-only">
+        <a href="/signup" className="create-account-button">
+          Create an account
+        </a>
+      </div>
+    )}
+  </div>
+</header>
+
 
       <main className="order-page-content">
         <OrderFlow />

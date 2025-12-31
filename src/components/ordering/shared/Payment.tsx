@@ -17,9 +17,10 @@ type PaymentProps = {
   selectedDimensions: ParcelDimensions[] | null
   selectedDeliveryMethod: DeliveryMethod | undefined
   clearUnsavedChanges: () => void
-  basePrice: number
-  locationSurcharge: number
-  finalPrice: number
+  basePrice?: number
+locationSurcharge?: number
+finalPrice?: number
+
 }
 
 export function Payment({
@@ -32,9 +33,13 @@ export function Payment({
   locationSurcharge,
   finalPrice,
 }: PaymentProps) {
-const formattedBasePrice = basePrice.toFixed(2)
-const formattedSurcharge = locationSurcharge.toFixed(2)
-const formattedFinalPrice = finalPrice.toFixed(2)
+const format = (v?: number) =>
+  typeof v === "number" ? v.toFixed(2) : "0.00"
+
+const formattedBasePrice = format(basePrice)
+const formattedSurcharge = format(locationSurcharge)
+const formattedFinalPrice = format(finalPrice)
+
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
