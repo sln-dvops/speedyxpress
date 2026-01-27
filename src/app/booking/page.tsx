@@ -18,45 +18,9 @@ export default async function OrderPage() {
 const isGuest = !user
   return (
     <>
-      <header className="order-header">
-  <div className="order-header-inner">
-    {user ? (
-      <>
-        <p className="order-greeting">
-          Hi, <span>{user.user_metadata?.display_name}</span>
-        </p>
-
-        <div className="order-actions">
-          <a href="/dashboard" className="dashboard-link">
-            Dashboard
-          </a>
-
-          <form action={logoutAction}>
-            <button type="submit" className="logout-button">
-              Logout
-            </button>
-          </form>
-        </div>
-      </>
-    ) : (
-      <div className="order-actions guest-only">
-        <p className="order-greeting">
-          Welcome to SpeedyXpress.
-        </p>
-        <a href="/login" className="create-account-button">
-          Log In
-        </a>
-        <a href="/signup" className="create-account-button">
-          Create an account
-        </a>
-      </div>
-    )}
-  </div>
-</header>
-
-
+     
       <main className="order-page-content">
-        <OrderFlow />
+        <OrderFlow user={user} />
       </main>
     </>
   );
