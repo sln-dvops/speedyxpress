@@ -17,9 +17,9 @@ export function OrderTypeSelection({ onNextStep }: OrderTypeSelectionProps) {
   return (
     <Card className={styles.container}>
       <CardHeader className={styles.header}>
-        <CardTitle className={styles.title}>
+        {/* <CardTitle className={styles.title}>
           What would you like to send?
-        </CardTitle>
+        </CardTitle> */}
         <p className={styles.subtitle}>Select parcel type.</p>
       </CardHeader>
 

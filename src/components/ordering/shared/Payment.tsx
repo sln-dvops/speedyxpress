@@ -35,10 +35,9 @@ export function Payment({
 }: PaymentProps) {
 const format = (v?: number) =>
   typeof v === "number" ? v.toFixed(2) : "0.00"
-
-const formattedBasePrice = format(basePrice)
-const formattedSurcharge = format(locationSurcharge)
-const formattedFinalPrice = format(finalPrice)
+const safeBasePrice = basePrice ?? 0
+const safeLocationSurcharge = locationSurcharge ?? 0
+const safeFinalPrice = finalPrice ?? safeBasePrice + safeLocationSurcharge
 
 
   const [isLoading, setIsLoading] = useState(false)
@@ -153,19 +152,22 @@ const formattedFinalPrice = format(finalPrice)
             <div className="border-t border-gray-200 pt-4 space-y-2">
   <div className="flex justify-between">
     <span className="text-gray-600">Base Delivery</span>
-    <span className="font-medium text-black">${formattedBasePrice}</span>
+    <span className="font-medium text-black">${safeBasePrice}</span>
   </div>
 
-  {locationSurcharge > 0 && (
+  {safeLocationSurcharge > 0 && (
   <div className="flex justify-between">
     <span className="text-gray-600">Location Surcharge</span>
-    <span className="font-medium text-black">${formattedSurcharge}</span>
+    <span className="font-medium text-black">
+      ${safeLocationSurcharge.toFixed(2)}
+    </span>
   </div>
 )}
 
+
   <div className="border-t border-gray-300 pt-2 flex justify-between items-center">
     <span className="text-lg text-gray-800">Total Price</span>
-    <span className="text-2xl font-bold text-black">${formattedFinalPrice}</span>
+    <span className="text-2xl font-bold text-black">${safeFinalPrice}</span>
   </div>
 </div>
 

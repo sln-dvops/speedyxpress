@@ -71,7 +71,9 @@ export function OrderDetails({
           <p className="text-black mb-2">
   Tracking Number:{" "}
   <span className="font-semibold">
-    {orderDetails.shortId}
+    {orderDetails.trackingNumber ||
+      orderDetails.parcels?.[0]?.short_id ||
+      "Pending"}
   </span>
 </p>
 

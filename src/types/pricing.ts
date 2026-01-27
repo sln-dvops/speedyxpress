@@ -28,7 +28,7 @@ export const PRICING_TIERS: PricingTier[] = [
 export interface LocationSurcharge {
   name: string
   amount: number
-  postalSectors?: number[]
+  postalSectors: number[]
   areas?: string[]
 }
 export const LOCATION_SURCHARGES: LocationSurcharge[] = [
@@ -42,29 +42,21 @@ export const LOCATION_SURCHARGES: LocationSurcharge[] = [
     amount: 6,
     postalSectors: [9,69],
   },
-  {
-    name: "Restricted Area",
-    amount: 15,
-    areas: ["Military", "Airport", "Immigration", "SATs"],
-  },
+
 ]
 export function getPostalSector(postalCode: string): number | null {
   if (!postalCode || postalCode.length < 2) return null
-  return parseInt(postalCode.substring(0, 2), 10)
+  const sector = Number(postalCode.slice(0, 2))
+  return Number.isNaN(sector) ? null : sector
 }
 
-export function calculateLocationSurcharge(
-  postalCode: string,
-  street?: string,
-  unitNo?: string
-): number {
-  // Normal postal-sector pricing
+export function calculateLocationSurcharge(postalCode: string): number {
   const sector = getPostalSector(postalCode)
   if (sector === null) return 0
 
-  for (const s of LOCATION_SURCHARGES) {
-    if (s.postalSectors?.includes(sector)) {
-      return s.amount
+  for (const tier of LOCATION_SURCHARGES) {
+    if (tier.postalSectors.includes(sector)) {
+      return tier.amount
     }
   }
 

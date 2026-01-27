@@ -166,17 +166,18 @@ export function OrderStatusRefresher({
           <p className="text-black mb-2">
             Your order has been {status === "paid" ? "confirmed" : "received"}.
           </p>
-          <p className="text-black mb-2">
-            Order Number:{" "}
-            <span className="font-semibold">{orderDetails.shortId}</span>
+
+          <p className="text-black mb-2 font-semibold">Tracking Numbers:</p>
+
+          <ul className="list-disc pl-5 text-black">
+            {orderDetails.parcels.map((parcel) => (
+              <li key={parcel.id}>{parcel.short_id}</li>
+            ))}
+          </ul>
+
+          <p className="mt-2">
+            Order Reference: <span>{orderDetails.shortId}</span>
           </p>
-          {status === "paid" ? (
-            <p className="text-green-600 font-semibold">Payment Status: Paid</p>
-          ) : (
-            <p className="text-amber-600 font-semibold">
-              Payment Status: {status || "Pending"}
-            </p>
-          )}
         </div>
 
         {status === "paid" && (

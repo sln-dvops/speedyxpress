@@ -1,78 +1,114 @@
-"use server"
+"use server";
 
-import { createClient } from "@/utils/supabase/server"
-import type { OrderWithParcels, RecipientDetails } from "@/types/order"
-import type { ParcelDimensions } from "@/types/pricing"
-import { isShortId } from "@/utils/orderIdUtils"
-import { isUUID } from "@/utils/isUUID"
+import { createClient } from "@/utils/supabase/server";
+import type { OrderWithParcels, RecipientDetails } from "@/types/order";
+import type { ParcelDimensions } from "@/types/pricing";
+import { isShortId } from "@/utils/orderIdUtils";
 
-export async function getOrderDetails(orderIdOrShortId: string): Promise<OrderWithParcels | null> {
+export async function getOrderDetails(
+  inputId: string
+): Promise<OrderWithParcels | null> {
   try {
-   const supabase = await createClient()
+    const supabase = await createClient();
 
-const {
-  data: { user },
-} = await supabase.auth.getUser()
+    let orderId: string | null = null;
 
-if (!user) {
-  return null
-}
+    /* -------------------------------------------------
+       CASE 1: Parcel tracking ID (SPD##########)
+       ------------------------------------------------- */
+    if (isShortId(inputId)) {
+      const { data: parcel } = await supabase
+        .from("parcels")
+        .select("order_id")
+        .eq("short_id", inputId)
+        .maybeSingle();
 
-let query = supabase.from("orders").select("*")
-
-
-   if (isUUID(orderIdOrShortId)) {
-  query = query.eq("id", orderIdOrShortId).eq("user_id", user.id)
-} else {
-  query = query.eq("short_id", orderIdOrShortId).eq("user_id", user.id)
-}
-
-
-    // Get the order details
-    const { data: order, error: orderError } = await query.single()
-
-    if (orderError) {
-      console.error(`Error fetching order ${orderIdOrShortId}:`, orderError)
-      return null
+      if (!parcel) return null;
+      orderId = parcel.order_id;
     }
 
-    // IMPORTANT: Always use the full UUID (order.id) for subsequent queries
-    // Get the parcels for this order using the full UUID
-    const { data: parcels, error: parcelsError } = await supabase.from("parcels").select("*").eq("order_id", order.id) // Using full UUID here
+    /* -------------------------------------------------
+       CASE 2: Try order UUID directly
+       ------------------------------------------------- */
+    if (!orderId) {
+      const { data: order } = await supabase
+        .from("orders")
+        .select("id")
+        .eq("id", inputId)
+        .maybeSingle();
 
-    if (parcelsError) {
-      console.error("Error fetching parcels:", parcelsError)
-      return null
+      if (order) {
+        orderId = order.id;
+      }
     }
 
-    // Check if this is a bulk order - using full UUID
-    const { data: bulkOrder, error: bulkOrderError } = await supabase
+    /* -------------------------------------------------
+       CASE 3: Try order short_id
+       ------------------------------------------------- */
+    if (!orderId) {
+      const { data: order } = await supabase
+        .from("orders")
+        .select("id")
+        .eq("short_id", inputId)
+        .maybeSingle();
+
+      if (order) {
+        orderId = order.id;
+      }
+    }
+
+    if (!orderId) return null;
+
+    /* -------------------------------------------------
+       Fetch order
+       ------------------------------------------------- */
+    const { data: order } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", orderId)
+      .single();
+
+    if (!order) return null;
+
+    /* -------------------------------------------------
+       Fetch parcels
+       ------------------------------------------------- */
+    const { data: parcels } = await supabase
+      .from("parcels")
+      .select("*")
+      .eq("order_id", order.id);
+
+    if (!parcels || parcels.length === 0) return null;
+
+    /* -------------------------------------------------
+       Fetch bulk order (optional)
+       ------------------------------------------------- */
+    const { data: bulkOrder } = await supabase
       .from("bulk_orders")
       .select("*")
-      .eq("order_id", order.id) // Using full UUID here
-      .maybeSingle()
+      .eq("order_id", order.id)
+      .maybeSingle();
 
-    if (bulkOrderError) {
-      console.error("Error fetching bulk order:", bulkOrderError)
-    }
-if (!parcels || parcels.length === 0) {
-  console.error("No parcels found for order:", order.id)
-  return null
-}
-
-    // Format the parcels data
+    /* -------------------------------------------------
+       Format parcels
+       ------------------------------------------------- */
     const formattedParcels: ParcelDimensions[] = parcels.map((parcel) => ({
       weight: parcel.weight,
       length: parcel.length,
       width: parcel.width,
       height: parcel.height,
-      effectiveWeight: Math.max(parcel.weight, (parcel.length * parcel.width * parcel.height) / 5000),
-      pricingTier: parcel.pricing_tier, // Include the pricing tier
-      id: parcel.id, // Include the parcel ID
-      short_id: order.short_id, 
-    }))
+      effectiveWeight: Math.max(
+        parcel.weight,
+        (parcel.length * parcel.width * parcel.height) / 5000
+      ),
+      pricingTier: parcel.pricing_tier,
+      id: parcel.id,
+      short_id: parcel.short_id,
+    }));
 
-    // Format recipient details for bulk orders
+    /* -------------------------------------------------
+       Format recipients
+       ------------------------------------------------- */
     const recipients: RecipientDetails[] = parcels.map((parcel, index) => ({
       name: parcel.recipient_name,
       address: parcel.recipient_address,
@@ -82,48 +118,54 @@ if (!parcels || parcels.length === 0) {
       line2: parcel.recipient_line2 || undefined,
       postalCode: parcel.recipient_postal_code,
       parcelIndex: index,
-      pricingTier: parcel.pricing_tier, // Include the pricing tier
-    }))
+      pricingTier: parcel.pricing_tier,
+    }));
 
-    // Construct the response - use the first parcel's recipient details for individual orders
-    const orderWithParcels: OrderWithParcels = {
+    /* -------------------------------------------------
+       Construct response
+       ------------------------------------------------- */
+    const result: OrderWithParcels = {
       orderNumber: order.id,
-      shortId: order.short_id, // Include the short_id in the response
+      shortId: order.short_id,
       senderName: order.sender_name,
       senderAddress: order.sender_address,
       senderContactNumber: order.sender_contact_number,
       senderEmail: order.sender_email,
-      // For individual orders, use the first parcel's recipient details
+
       recipientName: parcels[0].recipient_name,
-      recipientAddress: `${parcels[0].recipient_line1}, ${parcels[0].recipient_line2 || ""}, Singapore ${parcels[0].recipient_postal_code}`,
+      recipientAddress: `${parcels[0].recipient_line1}, ${
+        parcels[0].recipient_line2 || ""
+      }, Singapore ${parcels[0].recipient_postal_code}`,
       recipientContactNumber: parcels[0].recipient_contact_number,
       recipientEmail: parcels[0].recipient_email,
       recipientLine1: parcels[0].recipient_line1,
       recipientLine2: parcels[0].recipient_line2 || undefined,
       recipientPostalCode: parcels[0].recipient_postal_code,
-      parcelSize: parcels[0].parcel_size, // Add the missing parcelSize property
+
+      parcelSize: parcels[0].parcel_size,
       deliveryMethod: order.delivery_method,
       amount: order.amount,
       status: order.status,
       isBulkOrder: order.is_bulk_order,
+
       parcels: formattedParcels,
       recipients: order.is_bulk_order ? recipients : undefined,
-    }
+    };
 
     // Add bulk order details if applicable
     if (bulkOrder) {
-      orderWithParcels.bulkOrder = {
+      result.bulkOrder = {
         id: bulkOrder.id,
         totalParcels: bulkOrder.total_parcels,
         totalWeight: bulkOrder.total_weight,
-      }
-      orderWithParcels.totalParcels = bulkOrder.total_parcels
-      orderWithParcels.totalWeight = bulkOrder.total_weight
+      };
+      result.totalParcels = bulkOrder.total_parcels;
+      result.totalWeight = bulkOrder.total_weight;
     }
 
-    return orderWithParcels
-  } catch (error) {
-    console.error("Error getting order details:", error)
-    return null
+    return result;
+  } catch (err) {
+    console.error("getOrderDetails error:", err);
+    return null;
   }
 }

@@ -21,7 +21,7 @@ export function OrderFlow() {
 
   return (
     <div className="min-h-screen bg-yellow-400">
-      <div className="container mx-auto max-w-[800px] px-4">
+      <div className="container mx-auto max-w-[1000px] px-4">
         <div className="pt-8">
 
           <AnimatePresence mode="wait">

@@ -1,5 +1,5 @@
 "use server";
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/utils/supabase/server";
 import { createHitPayRequestBody, HITPAY_API_ENDPOINT } from "@/config/hitpay";
 import type {
   OrderDetails,
@@ -7,7 +7,7 @@ import type {
   RecipientDetails,
 } from "@/types/order";
 import type { ParcelDimensions } from "@/types/pricing";
-import { determinePricingTier, calculateShippingPrice } from "@/types/pricing";
+import { determinePricingTier, calculateShippingPrice, calculateLocationSurcharge } from "@/types/pricing";
 import { generateTrackingId } from "@/utils/orderIdUtils";
 
 // Update the createOrder function to handle recipients properly
@@ -55,9 +55,27 @@ const userId = user?.id ?? null
       );
     }, 0);
 
-    // Round to 2 decimal places for comparison
-    const clientAmount = Math.round((orderDetails.amount || 0) * 100) / 100;
-    const serverAmount = Math.round(serverCalculatedPrice * 100) / 100;
+    const basePrice = parcels.reduce(
+  (sum, p) => sum + calculateShippingPrice(p, orderDetails.deliveryMethod),
+  0
+);
+
+const locationSurcharge = (orderDetails.recipients ?? []).reduce(
+  (sum, r) => sum + calculateLocationSurcharge(r.postalCode),
+  0
+);
+
+const serverAmount =
+  Math.round((basePrice + locationSurcharge) * 100) / 100;
+
+
+    const clientAmount = Math.round((orderDetails.amount ?? 0) * 100) / 100;
+
+    if (clientAmount !== serverAmount) {
+      throw new Error(
+        `Invalid price calculation. Expected: $${serverAmount.toFixed(2)}`
+      );
+    }
 
     // Check if the client-provided amount matches the server calculation (with small tolerance for floating point issues)
     if (Math.abs(clientAmount - serverAmount) > 0.01) {
@@ -111,6 +129,7 @@ const userId = user?.id ?? null
       const { data: bulkOrderData, error: bulkOrderError } = await supabase
         .from("bulk_orders")
         .insert({
+          user_id: userId,
           order_id: orderId,
           total_parcels: parcels.length,
           total_weight: totalWeight,

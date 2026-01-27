@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ParcelDimensions } from "@/components/ordering/bulk-order/BulkParcelSize";
 import { DeliveryMethod } from "@/components/ordering/shared/DeliveryMethod";
 import { SendFrom } from "@/components/ordering/shared/SendFrom";
 import { BulkSendTo } from "@/components/ordering/bulk-order/BulkSendTo";
 import { Payment } from "@/components/ordering/shared/Payment";
-import { calculateLocationSurcharge } from "@/types/pricing";
+import {
+  calculateLocationSurcharge,
+  calculateShippingPrice,
+  HAND_TO_HAND_FEE,
+} from "@/types/pricing";
 
 import type {
   ParcelDimensions as ParcelDimensionsType,
@@ -36,8 +40,30 @@ export function BulkOrderFlow({
     locationSurcharge: 0,
     finalPrice: 0,
   });
+  const updatePricing = () => {
+  const totalBasePrice = (selectedDimensions ?? []).reduce(
+    (sum, parcel) =>
+      sum + calculateShippingPrice(parcel, selectedDeliveryMethod || "atl"),
+    0
+  );
+
+  const totalLocationSurcharge = (recipients ?? []).reduce(
+    (sum, r) => sum + calculateLocationSurcharge(r.postalCode),
+    0
+  );
+
+
+  setPricing({
+    basePrice: totalBasePrice,
+    locationSurcharge: totalLocationSurcharge,
+    finalPrice:
+      totalBasePrice + totalLocationSurcharge ,
+  });
+};
+
 
   const [currentStep, setCurrentStep] = useState<Step>(0);
+
   const [selectedDimensions, setSelectedDimensions] = useState<
     ParcelDimensionsType[] | null
   >(null);
@@ -59,6 +85,7 @@ export function BulkOrderFlow({
     isBulkOrder: true,
     recipients: [],
   });
+
   const [senderFormData, setSenderFormData] = useState<AddressFormData>({
     name: "",
     contactNumber: "",
@@ -67,6 +94,7 @@ export function BulkOrderFlow({
     unitNo: "",
     postalCode: "",
   });
+
   const [recipientFormData, setRecipientFormData] =
     useState<ExtendedAddressFormData>({
       name: "",
@@ -77,9 +105,11 @@ export function BulkOrderFlow({
       postalCode: "",
       recipients: [],
     });
+
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<
     DeliveryMethodType | undefined
   >(undefined);
+
   const [recipients, setRecipients] = useState<RecipientDetails[]>([]);
 
   const handleNextStep = () => {
@@ -110,12 +140,8 @@ export function BulkOrderFlow({
   const updateRecipientFormData = (data: ExtendedAddressFormData) => {
     setRecipientFormData(data);
 
-    // Calculate location surcharge once for the bulk order
-    const locationSurcharge = calculateLocationSurcharge(
-      data.postalCode,
-      data.street,
-      data.unitNo
-    );
+    // Calculate location surcharge based on recipient's postal code (from orderDetails)
+    const locationSurcharge = calculateLocationSurcharge(data.postalCode);
 
     if (data.recipients && data.recipients.length > 0) {
       setRecipients(data.recipients);
@@ -123,9 +149,9 @@ export function BulkOrderFlow({
       setOrderDetails((prevDetails) => ({
         ...prevDetails,
         recipients: data.recipients,
-        recipientPostalCode: data.postalCode,
+        recipientPostalCode: data.postalCode, // Use the recipient's postal code
         recipientAddress: `${data.street}, ${data.unitNo}, ${data.postalCode}`,
-        locationSurcharge, // ✅ ADD THIS
+        locationSurcharge, // Store the calculated location surcharge
       }));
     }
   };
@@ -137,6 +163,11 @@ export function BulkOrderFlow({
       recipients: newRecipients,
     }));
   };
+
+  useEffect(() => {
+    updatePricing();
+  }, [selectedDimensions, selectedDeliveryMethod, recipients]
+);
 
   return (
     <>
@@ -177,11 +208,10 @@ export function BulkOrderFlow({
                 totalParcels={selectedDimensions.length}
                 totalWeight={selectedDimensions.reduce(
                   (sum, p) => sum + p.weight,
-                  0
+                  0,
                 )}
                 selectedDeliveryMethod={selectedDeliveryMethod}
                 setSelectedDeliveryMethod={setSelectedDeliveryMethod}
-                onPricingCalculated={setPricing} // ✅ THIS LINE FIXES IT
               />
             </motion.div>
           )}

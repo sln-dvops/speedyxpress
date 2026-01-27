@@ -40,6 +40,12 @@ const isGuest = !user
       </>
     ) : (
       <div className="order-actions guest-only">
+        <p className="order-greeting">
+          Welcome to SpeedyXpress.
+        </p>
+        <a href="/login" className="create-account-button">
+          Log In
+        </a>
         <a href="/signup" className="create-account-button">
           Create an account
         </a>

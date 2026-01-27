@@ -46,12 +46,7 @@ type DeliveryMethodProps = {
   totalWeight?: number;
   selectedDeliveryMethod: DeliveryMethodType | undefined;
   setSelectedDeliveryMethod: (method: DeliveryMethodType) => void;
-  onPricingCalculated: (pricing: {
-    basePrice: number;
-    locationSurcharge: number;
-    finalPrice: number;
-  }) => void;
-};
+  };
 
 export function DeliveryMethod({
   onPrevStep,
@@ -60,8 +55,7 @@ export function DeliveryMethod({
   isBulkOrder = false,
   totalParcels = 1,
   selectedDeliveryMethod,
-  setSelectedDeliveryMethod,
-  onPricingCalculated,
+  setSelectedDeliveryMethod
 }: DeliveryMethodProps) {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -107,23 +101,6 @@ export function DeliveryMethod({
 
   const finalPrice =
     totalBasePrice + totalLocationSurcharge + totalHandToHandFee;
-
-  // ✅ Send pricing to parent (BulkOrderFlow)
-  useEffect(() => {
-    if (!selectedDeliveryMethod) return;
-
-    onPricingCalculated({
-      basePrice: totalBasePrice,
-      locationSurcharge: totalLocationSurcharge,
-      finalPrice,
-    });
-  }, [
-    selectedDeliveryMethod,
-    totalBasePrice,
-    totalLocationSurcharge,
-    finalPrice,
-    onPricingCalculated,
-  ]);
 
   if (selectedDimensions.length === 0) {
     return (
