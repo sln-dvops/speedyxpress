@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import { ParcelList } from "./parcelList";
+import { logoutAction } from "../actions/ordering/guest-order/logout";
 
 // Define types explicitly for order and parcel
 interface Order {
@@ -69,9 +71,30 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-yellow-400 py-12">
       <div className="container mx-auto max-w-5xl px-4">
-        <h1 className="text-4xl font-extrabold text-black mb-8">
-          My Parcels
-        </h1>
+        <div className="mb-8 flex items-center justify-between rounded-xl bg-white px-6 py-4 backdrop-blur-md shadow">
+  {/* Left side */}
+  <h1 className="text-2xl text-black-700">
+    My Parcels
+  </h1>
+
+  {/* Right side */}
+  <div className="flex items-center gap-4">
+    <a href="/booking" className="dashboard-link">
+                    Home
+                  </a>
+
+    <form action={logoutAction}>
+      <button
+        type="submit"
+        className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white cursor-pointer hover:bg-red-600 transition"
+      >
+        Logout
+      </button>
+    </form>
+  </div>
+</div>
+
+        
 
         {(!parcels || parcels.length === 0) && (
           <div className="bg-white rounded-lg p-8 shadow">
@@ -81,47 +104,12 @@ export default async function DashboardPage() {
           </div>
         )}
 
+        
+
         {parcels && parcels.length > 0 && (
-          <div className="space-y-4">
-            {parcels.map((parcel) => (
-              <div
-                key={parcel.id}
-                className="bg-white rounded-lg shadow p-6 flex items-center justify-between"
-              >
-                {/* Left: parcel identity */}
-                <div>
-                  <p className="font-semibold text-black">
-                    Tracking ID: {parcel.short_id}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Recipient: {parcel.recipient_name}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Address: {parcel.recipient_address}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(parcel.created_at).toLocaleString()}
-                  </p>
-                </div>
+  <ParcelList parcels={parcels} />
+)}
 
-                {/* Right: status + actions */}
-                <div className="flex items-center gap-6">
-                  {/* Accessing delivery_status from the nested order object */}
-                  <span className="text-sm font-medium capitalize">
-                    {/* {parcel.order?.delivery_status ?? "Processing"} */ "Processing"}
-                  </span>
-
-                  <Link
-                    href={`/order/${parcel.short_id}`}
-                    className="text-black underline font-medium"
-                  >
-                    Track
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

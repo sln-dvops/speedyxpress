@@ -33,6 +33,28 @@ export default function LoginPage() {
     router.push("/")
   }
 
+  const handleForgotPassword = async () => {
+  if (!email) {
+    setError("Please enter your email first")
+    return
+  }
+
+  setLoading(true)
+  setError(null)
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  })
+
+  setLoading(false)
+
+  if (error) {
+    setError(error.message)
+  } else {
+    setError("Password reset email sent. Check your inbox.")
+  }
+}
+
   return (
     <div className="auth-container">
       <div className="logo-wrapper">
@@ -58,6 +80,14 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <p
+  className="text-sm text-right cursor-pointer text-gray-600 hover:underline"
+  onClick={() => router.push("/forgot-password")}
+>
+  Forgot password?
+</p>
+
+
 
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Log in"}

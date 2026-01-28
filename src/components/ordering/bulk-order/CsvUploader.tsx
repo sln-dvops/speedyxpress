@@ -232,7 +232,7 @@ export function CsvUploader({ setParcels, setRecipients, isValidDimensions }: Cs
   }}
 >
 <div className={styles.header}>
-  <h3 className={styles.title}>Bulk Upload Parcels & Recipients</h3>
+  <h3 className={styles.title}>Upload The File Here.</h3>
   <p className={styles.description}>
     Drag & drop a CSV file  with parcel details and recipient information. The CSV must include columns for weight, length, width, height, name, contactNumber, email, street, unitNo, and postalCode.
   </p>

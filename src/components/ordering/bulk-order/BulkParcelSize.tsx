@@ -133,11 +133,11 @@ export function ParcelDimensions({
     <Card className="bg-white shadow-lg">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-black">
-          Bulk Order Parcel Details
+          Multiple Parcels Details
         </CardTitle>
 
         <Badge variant="outline" className="bg-yellow-200 text-black border-black mt-2">
-          Bulk Order
+          Multiple Parcels
         </Badge>
 
         {parcels.length > 0 && (
@@ -206,7 +206,7 @@ export function ParcelDimensions({
 
       {parcels.length < 2 && (
         <p className="text-sm text-red-500 text-center mt-2">
-          Please add at least 2 parcels for a bulk order.
+          Please add at least 2 parcels for this order.
         </p>
       )}
     </Card>

@@ -17,9 +17,9 @@ export function OrderTypeSelection({ onNextStep }: OrderTypeSelectionProps) {
   return (
     <Card className={styles.container}>
       <CardHeader className={styles.header}>
-        {/* <CardTitle className={styles.title}>
+        <CardTitle className={styles.title}>
           What would you like to send?
-        </CardTitle> */}
+        </CardTitle>
         <p className={styles.subtitle}>Select parcel type.</p>
       </CardHeader>
 
@@ -29,14 +29,14 @@ export function OrderTypeSelection({ onNextStep }: OrderTypeSelectionProps) {
             icon={
               <Image
                 src="/icons/individual-order.png"
-                alt="Individual order"
+                alt="Single Parcel"
                 width={60}
                 height={60}
               />
             }
-            title="Individual Order"
+            title="Single Parcel"
             description="Send a single parcel to once recipient. Perfect for sending gifts, documents, or small items."
-            actionLabel="Select Individual"
+            actionLabel="Select Single"
             onClick={() => onNextStep("individual")}
           />
 
@@ -44,14 +44,14 @@ export function OrderTypeSelection({ onNextStep }: OrderTypeSelectionProps) {
             icon={
               <Image
                 src="/icons/bulk-order.png"
-                alt="Bulk order"
+                alt="Multiple Parcels"
                 width={60}
                 height={60}
               />
             }
-            title="Bulk Order"
+            title="Multiple Parcels"
             description="Send multiple parcels to different recipients. Ideal for businesses or sending to multiple family members."
-            actionLabel="Select Bulk"
+            actionLabel="Select Multiple"
             onClick={() => onNextStep("bulk")}
           />
         </div>

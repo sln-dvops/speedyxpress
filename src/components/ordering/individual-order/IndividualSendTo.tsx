@@ -35,7 +35,7 @@ export function IndividualSendTo({ onPrevStep, onNextStep, formData, updateFormD
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-black">Recipient Details</CardTitle>
         <Badge variant="outline" className="bg-yellow-100 text-black border-black mt-2">
-          Individual Order
+          Single Parcel
         </Badge>
       </CardHeader>
       <CardContent className="p-6">

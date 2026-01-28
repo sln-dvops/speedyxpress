@@ -118,12 +118,12 @@ export function ParcelDimensions({
     <Card className={styles.container}>
       <CardHeader className={styles.header}>
         <CardTitle className={styles.title}>
-          Single Package Details
+          Single Parcel Details
         </CardTitle>
 
         <div className={styles.badges}>
           <Badge className={styles.orderTypeBadge}>
-            Single Package
+            Single Parcel
           </Badge>
 
           {parcels.length === 1 && (
@@ -137,7 +137,7 @@ export function ParcelDimensions({
       <CardContent className="space-y-6">
         <div className={styles.infoBox}>
           <h3 className={styles.infoTitle}>
-            Single Package Information
+            Single Parcel Information
           </h3>
           <p className={styles.infoText}>
             Please provide the dimensions and weight of your parcel.

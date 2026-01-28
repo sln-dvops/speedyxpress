@@ -128,16 +128,12 @@ export function IndividualOrderFlow({
     }
 
     const surcharge = calculateLocationSurcharge(
-      recipientFormData.postalCode,
-      recipientFormData.street,
-      recipientFormData.unitNo
+      recipientFormData.postalCode
     );
 
     setLocationSurcharge(surcharge);
   }, [
-    recipientFormData.postalCode,
-    recipientFormData.street,
-    recipientFormData.unitNo,
+    recipientFormData.postalCode
   ]);
 
   const finalPrice = basePrice + locationSurcharge;

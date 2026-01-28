@@ -24,38 +24,61 @@ export function OrderFlow({ user }: { user: any }) {
     <div className="min-h-screen bg-yellow-400">
       <div className="container mx-auto max-w-[1000px] px-4 pt-8">
         {/* Header */}
-        <header className="order-header mb-6">
-          <div className="order-header-inner flex justify-between items-center">
-            {user ? (
-              <>
-                <p className="order-greeting">
-                  Hi, <span>{user.user_metadata?.display_name}</span>
-                </p>
-                <div className="order-actions flex gap-2">
-                  <a href="/dashboard" className="dashboard-link">
+        <header className="mb-6">
+  <div className="mb-8 flex items-center justify-between rounded-xl bg-white px-6 py-4 backdrop-blur-md shadow">
+    
+    {user ? (
+      <>
+        {/* Logged-in state */}
+        <p className="text-2xl text-black-700">
+          Welcome back,{" "}
+          <span className="text-2xl text-black-700">
+            {user.user_metadata?.display_name ?? "User"}.
+          </span>
+        </p>
+
+        <div className="flex items-center gap-4">
+          <a href="/dashboard" className="dashboard-link">
                     Dashboard
                   </a>
-                  <form action={logoutAction}>
-                    <button type="submit" className="logout-button">
-                      Logout
-                    </button>
-                  </form>
 
-                </div>
-              </>
-            ) : (
-              <div className="order-actions guest-only flex gap-2">
-                <p className="order-greeting">Welcome to SpeedyXpress.</p>
-                <a href="/login" className="create-account-button">
-                  Log In
-                </a>
-                <a href="/signup" className="create-account-button">
-                  Create an account
-                </a>
-              </div>
-            )}
-          </div>
-        </header>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="
+                rounded-lg bg-black px-4 py-2
+                text-sm font-medium text-white
+                hover:bg-red-600
+                cursor-pointer
+              "
+            >
+              Logout
+            </button>
+          </form>
+        </div>
+      </>
+    ) : (
+      <>
+        {/* Guest state */}
+        <p className="text-xl text-black-700">
+          Welcome to Speedy Express !
+          
+        </p>
+
+        <div className="flex items-center gap-4">
+          <a href="/login" className="dashboard-link">
+                    Log In
+                  </a>
+          <a href="/signup" className="dashboard-link">
+                    Create an account
+                  </a>
+        </div>
+      </>
+    )}
+  </div>
+</header>
+
+
 
         {/* Order Flow */}
         <AnimatePresence mode="wait">
