@@ -1,6 +1,6 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
-import { createHitPayRequestBody, HITPAY_API_ENDPOINT } from "@/config/hitpay";
+import { createHitPayRequestBody, HITPAY_API_ENDPOINT, HITPAY_SUCCESS_PATH } from "@/config/hitpay";
 import type {
   OrderDetails,
   HitPayResponse,
@@ -226,7 +226,8 @@ const serverAmount =
     // Create HitPay payment request
     // Update the redirect URL to include the order ID
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const redirectUrl = `${baseUrl}/order/${orderShortId}`;
+    const redirectUrl = `${baseUrl}${HITPAY_SUCCESS_PATH}?orderId=${orderId}`;
+
 
     const hitPayRequestBody = createHitPayRequestBody({
       ...orderDetails,
@@ -257,7 +258,8 @@ const serverAmount =
         success: true,
         orderId,
         orderShortId,
-        paymentUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order/${orderShortId}`,
+        paymentUrl: `${process.env.NEXT_PUBLIC_BASE_URL}${HITPAY_SUCCESS_PATH}?orderId=${orderId}`,
+
       };
     }
 

@@ -544,6 +544,26 @@ textarea:-moz-autofill {
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
 }
 
+.password-rules {
+  padding-left: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #535353;
+}
+
+.password-rules li {
+  margin-bottom: 4px;
+}
+
+.password-rules li.valid {
+  color: #22c55e; /* green */
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .logo-wrapper {
   display: flex;
   justify-content: center;

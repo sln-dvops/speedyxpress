@@ -12,16 +12,34 @@ export default function SignupPage() {
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
 
+  const [showPasswordRules, setShowPasswordRules] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  
+  // Password validation rules
+  const passwordRules = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password),
+  }
+
+  const allPasswordRulesPassed = Object.values(passwordRules).every(Boolean)
+  const passwordsMatch = password === confirmPassword && confirmPassword.length > 0
+
+  const canSubmit = allPasswordRulesPassed && passwordsMatch && !loading
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!canSubmit) return
+
     setLoading(true)
     setError(null)
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -47,6 +65,7 @@ export default function SignupPage() {
       <div className="logo-wrapper">
         <img src="/images/speedylogo.png" alt="Company Logo" />
       </div>
+
       <h1>Create your account</h1>
       <p className="subtitle">Get started in under a minute</p>
 
@@ -75,15 +94,50 @@ export default function SignupPage() {
           required
         />
 
+        {/* Password */}
         <input
           type="password"
-          placeholder="Password (min 6 chars)"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onFocus={() => setShowPasswordRules(true)}
           required
         />
 
-        <button type="submit" disabled={loading}>
+        {showPasswordRules && (
+          <ul className="password-rules">
+            <li className={passwordRules.length ? "valid" : ""}>
+              At least 8 characters
+            </li>
+            <li className={passwordRules.uppercase ? "valid" : ""}>
+              One uppercase letter
+            </li>
+            <li className={passwordRules.lowercase ? "valid" : ""}>
+              One lowercase letter
+            </li>
+            <li className={passwordRules.number ? "valid" : ""}>
+              One number
+            </li>
+            <li className={passwordRules.special ? "valid" : ""}>
+              One special character
+            </li>
+          </ul>
+        )}
+
+        {/* Confirm Password */}
+        <input
+          type="password"
+          placeholder="Confirm password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+
+        {confirmPassword.length > 0 && !passwordsMatch && (
+          <p className="error">Passwords do not match</p>
+        )}
+
+        <button type="submit" disabled={!canSubmit}>
           {loading ? "Creating account..." : "Sign up"}
         </button>
       </form>
@@ -96,16 +150,16 @@ export default function SignupPage() {
         Already have an account?{" "}
         <span onClick={() => router.push("/login")}>Log in</span>
       </p>
-      <div className="guest-section">
-  <button
-    type="button"
-    className="guest-button"
-    onClick={() => router.push("/booking")}
-  >
-    Continue as guest
-  </button>
-</div>
 
+      <div className="guest-section">
+        <button
+          type="button"
+          className="guest-button"
+          onClick={() => router.push("/booking")}
+        >
+          Continue as guest
+        </button>
+      </div>
     </div>
   )
 }
