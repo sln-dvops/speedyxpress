@@ -23,7 +23,7 @@ export function ParcelList({ parcels, handleEditParcel, handleRemoveParcel }: Pa
               <div className="flex-1">
                 <p className="font-medium text-black">Parcel {index + 1}</p>
                 <p className="text-sm text-gray-600">
-                  {parcel.weight}kg • {parcel.length}cm × {parcel.width}cm × {parcel.height}cm
+                  {parcel.weight}kg 
                 </p>
               </div>
               <div className="flex space-x-2">

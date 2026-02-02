@@ -34,7 +34,7 @@ import {
   calculateShippingPrice,
   PRICING_TIERS,
   HAND_TO_HAND_FEE,
-  getPricingTier,
+  getPricingTierByWeight,
 } from "@/types/pricing";
 
 type DeliveryMethodProps = {
@@ -46,7 +46,7 @@ type DeliveryMethodProps = {
   totalWeight?: number;
   selectedDeliveryMethod: DeliveryMethodType | undefined;
   setSelectedDeliveryMethod: (method: DeliveryMethodType) => void;
-  };
+};
 
 export function DeliveryMethod({
   onPrevStep,
@@ -55,43 +55,39 @@ export function DeliveryMethod({
   isBulkOrder = false,
   totalParcels = 1,
   selectedDeliveryMethod,
-  setSelectedDeliveryMethod
+  setSelectedDeliveryMethod,
 }: DeliveryMethodProps) {
   const [showDetails, setShowDetails] = useState(false);
 
   const calculatedTotalWeight = selectedDimensions.reduce(
     (sum, parcel) => sum + parcel.weight,
-    0
+    0,
   );
 
   const parcelDetails = selectedDimensions.map((parcel, index) => {
-    const tierInfo = getPricingTier(parcel);
+    const tier = getPricingTierByWeight(parcel.weight);
 
     const basePrice = calculateShippingPrice(parcel, "atl");
-    const locationSurcharge = 0; // ✅ safe default (no postal code here yet)
+    const locationSurcharge = 0;
 
     const handToHandFee =
       selectedDeliveryMethod === "hand-to-hand" ? HAND_TO_HAND_FEE : 0;
 
     return {
       parcelNumber: index + 1,
-      actualWeight: parcel.weight,
-      actualWeightTier: tierInfo.chargeableWeight,
-      volumetricWeight: tierInfo.volumetricWeight,
-      volumetricWeightTier: tierInfo.volumetricWeight,
-      effectiveTier: tierInfo.tier.name,
+      weight: parcel.weight,
+      pricingTier: tier.name,
       basePrice,
       locationSurcharge,
       handToHandFee,
       totalPrice: basePrice + locationSurcharge + handToHandFee,
-      dimensions: `${parcel.length}cm × ${parcel.width}cm × ${parcel.height}cm`,
     };
   });
 
   const totalBasePrice = parcelDetails.reduce((sum, p) => sum + p.basePrice, 0);
   const totalLocationSurcharge = parcelDetails.reduce(
     (sum, p) => sum + p.locationSurcharge,
-    0
+    0,
   );
 
   const totalHandToHandFee =
@@ -250,52 +246,33 @@ export function DeliveryMethod({
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-4 text-sm">
-                      {/* First row: Dimensions, Actual Weight, Volumetric Weight */}
-                      <div className="grid grid-cols-3 gap-2">
+                      {/* Weight & Tier */}
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="font-medium">Dimensions:</p>
-                          <p>{detail.dimensions}</p>
+                          <p className="font-medium">Parcel Weight:</p>
+                          <p>{detail.weight.toFixed(2)} kg</p>
                         </div>
                         <div>
-                          <p className="font-medium">Actual Weight:</p>
+                          <p className="font-medium">Pricing Tier:</p>
                           <p>
-                            {detail.actualWeight.toFixed(2)} kg{" "}
-                            <span className="text-xs">
-                              ({detail.actualWeightTier})
-                            </span>
+                            {detail.pricingTier} ($
+                            {PRICING_TIERS.find(
+                              (t) => t.name === detail.pricingTier,
+                            )?.price.toFixed(2)}
+                            )
                           </p>
                         </div>
-                        <div>
-                          <p className="font-medium">Volumetric Weight:</p>
-                          <p>
-                            {detail.volumetricWeight.toFixed(2)} kg{" "}
-                            <span className="text-xs">
-                              ({detail.volumetricWeightTier})
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Second row: Pricing Tier */}
-                      <div className="border-t border-gray-200 pt-2">
-                        <p className="font-medium">Pricing Tier:</p>
-                        <p>
-                          {detail.effectiveTier} ($
-                          {PRICING_TIERS.find(
-                            (t) => t.name === detail.effectiveTier
-                          )?.price.toFixed(2)}
-                          )
-                        </p>
                       </div>
                     </div>
 
                     <div className={styles.totalBox}>
                       <div className="flex justify-between items-center">
                         <p className="font-medium">Base Price:</p>
-                        <p className="text-lg ">
+                        <p className="text-lg">
                           ${detail.basePrice.toFixed(2)}
                         </p>
                       </div>
+
                       {selectedDeliveryMethod === "hand-to-hand" && (
                         <div className="flex justify-between items-center mt-1">
                           <p className="font-medium">Hand-to-Hand Fee:</p>
@@ -304,6 +281,7 @@ export function DeliveryMethod({
                           </p>
                         </div>
                       )}
+
                       <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
                         <p className="font-medium">Total Parcel Price:</p>
                         <p className="text-lg text-black">

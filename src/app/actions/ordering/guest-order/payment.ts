@@ -1,29 +1,36 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
-import { createHitPayRequestBody, HITPAY_API_ENDPOINT, HITPAY_SUCCESS_PATH } from "@/config/hitpay";
+import {
+  createHitPayRequestBody,
+  HITPAY_API_ENDPOINT,
+  HITPAY_SUCCESS_PATH,
+} from "@/config/hitpay";
 import type {
   OrderDetails,
   HitPayResponse,
   RecipientDetails,
 } from "@/types/order";
 import type { ParcelDimensions } from "@/types/pricing";
-import { determinePricingTier, calculateShippingPrice, calculateLocationSurcharge } from "@/types/pricing";
+import {
+  determinePricingTier,
+  calculateShippingPrice,
+  calculateLocationSurcharge,
+} from "@/types/pricing";
 import { generateTrackingId } from "@/utils/orderIdUtils";
 
 // Update the createOrder function to handle recipients properly
 export async function createOrder(
   orderDetails: OrderDetails,
   parcels: ParcelDimensions[],
-  recipients?: RecipientDetails[]
+  recipients?: RecipientDetails[],
 ) {
-
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   const {
     data: { user },
     error: userError,
-  } = await supabase.auth.getUser()
-const userId = user?.id ?? null
+  } = await supabase.auth.getUser();
+  const userId = user?.id ?? null;
 
   try {
     console.log("Creating order with the following details:");
@@ -56,34 +63,33 @@ const userId = user?.id ?? null
     }, 0);
 
     const basePrice = parcels.reduce(
-  (sum, p) => sum + calculateShippingPrice(p, orderDetails.deliveryMethod),
-  0
-);
+      (sum, p) => sum + calculateShippingPrice(p, orderDetails.deliveryMethod),
+      0,
+    );
 
-const locationSurcharge = (orderDetails.recipients ?? []).reduce(
-  (sum, r) => sum + calculateLocationSurcharge(r.postalCode),
-  0
-);
+    const locationSurcharge = (orderDetails.recipients ?? []).reduce(
+      (sum, r) => sum + calculateLocationSurcharge(r.postalCode),
+      0,
+    );
 
-const serverAmount =
-  Math.round((basePrice + locationSurcharge) * 100) / 100;
-
+    const serverAmount =
+      Math.round((basePrice + locationSurcharge) * 100) / 100;
 
     const clientAmount = Math.round((orderDetails.amount ?? 0) * 100) / 100;
 
     if (clientAmount !== serverAmount) {
       throw new Error(
-        `Invalid price calculation. Expected: $${serverAmount.toFixed(2)}`
+        `Invalid price calculation. Expected: $${serverAmount.toFixed(2)}`,
       );
     }
 
     // Check if the client-provided amount matches the server calculation (with small tolerance for floating point issues)
     if (Math.abs(clientAmount - serverAmount) > 0.01) {
       console.error(
-        `Price mismatch: Client: ${clientAmount}, Server: ${serverAmount}`
+        `Price mismatch: Client: ${clientAmount}, Server: ${serverAmount}`,
       );
       throw new Error(
-        `Invalid price calculation. Expected: $${serverAmount.toFixed(2)}`
+        `Invalid price calculation. Expected: $${serverAmount.toFixed(2)}`,
       );
     }
 
@@ -123,7 +129,7 @@ const serverAmount =
     if (orderDetails.isBulkOrder && parcels.length > 1) {
       const totalWeight = parcels.reduce(
         (sum, parcel) => sum + parcel.weight,
-        0
+        0,
       );
 
       const { data: bulkOrderData, error: bulkOrderError } = await supabase
@@ -139,7 +145,7 @@ const serverAmount =
 
       if (bulkOrderError) {
         console.error("Bulk order creation error:", bulkOrderError);
-        throw new Error(bulkOrderError.message)
+        throw new Error(bulkOrderError.message);
         // We'll continue even if this fails - it's not critical
       }
 
@@ -197,9 +203,10 @@ const serverAmount =
         bulk_order_id: bulkOrderId,
         parcel_size: `${parcel.weight}kg`,
         weight: parcel.weight,
-        length: parcel.length,
-        width: parcel.width,
-        height: parcel.height,
+        // dimensions are now metadata only
+        length: parcel.length ?? null,
+        width: parcel.width ?? null,
+        height: parcel.height ?? null,
         pricing_tier: pricingTier, // Store the pricing tier
         recipient_name: recipientName,
         recipient_address: recipientAddress,
@@ -228,7 +235,6 @@ const serverAmount =
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const redirectUrl = `${baseUrl}${HITPAY_SUCCESS_PATH}?orderId=${orderId}`;
 
-
     const hitPayRequestBody = createHitPayRequestBody({
       ...orderDetails,
       orderNumber: orderShortId, // Use short_id instead of full UUID
@@ -238,7 +244,7 @@ const serverAmount =
 
     console.log(
       "HitPay request body:",
-      JSON.stringify(hitPayRequestBody, null, 2)
+      JSON.stringify(hitPayRequestBody, null, 2),
     );
     console.log("Using HitPay API endpoint:", HITPAY_API_ENDPOINT);
 
@@ -259,7 +265,6 @@ const serverAmount =
         orderId,
         orderShortId,
         paymentUrl: `${process.env.NEXT_PUBLIC_BASE_URL}${HITPAY_SUCCESS_PATH}?orderId=${orderId}`,
-
       };
     }
 

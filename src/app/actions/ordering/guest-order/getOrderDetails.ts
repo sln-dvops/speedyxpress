@@ -6,7 +6,7 @@ import type { ParcelDimensions } from "@/types/pricing";
 import { isShortId } from "@/utils/orderIdUtils";
 
 export async function getOrderDetails(
-  inputId: string
+  inputId: string,
 ): Promise<OrderWithParcels | null> {
   try {
     const supabase = await createClient();
@@ -60,25 +60,25 @@ export async function getOrderDetails(
     if (!orderId) return null;
 
     /* -------------------------------------------------
-       Fetch order
-       ------------------------------------------------- */
+   Fetch order
+------------------------------------------------- */
     const { data: order } = await supabase
       .from("orders")
       .select("*")
       .eq("id", orderId)
-      .single();
+      .maybeSingle();
 
     if (!order) return null;
 
     /* -------------------------------------------------
-       Fetch parcels
-       ------------------------------------------------- */
+   Fetch parcels
+------------------------------------------------- */
     const { data: parcels } = await supabase
       .from("parcels")
       .select("*")
       .eq("order_id", order.id);
 
-    if (!parcels || parcels.length === 0) return null;
+    if (!parcels) return null;
 
     /* -------------------------------------------------
        Fetch bulk order (optional)
@@ -94,13 +94,12 @@ export async function getOrderDetails(
        ------------------------------------------------- */
     const formattedParcels: ParcelDimensions[] = parcels.map((parcel) => ({
       weight: parcel.weight,
-      length: parcel.length,
-      width: parcel.width,
-      height: parcel.height,
-      effectiveWeight: Math.max(
-        parcel.weight,
-        (parcel.length * parcel.width * parcel.height) / 5000
-      ),
+
+      // dimensions retained as raw metadata only
+      length: parcel.length ?? undefined,
+      width: parcel.width ?? undefined,
+      height: parcel.height ?? undefined,
+
       pricingTier: parcel.pricing_tier,
       id: parcel.id,
       short_id: parcel.short_id,

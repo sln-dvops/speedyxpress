@@ -65,12 +65,11 @@ export function convertOrderToDetrackJob(order: OrderWithParcels): DetrackJob {
     parcel_width: firstParcel.width,
     parcel_height: firstParcel.height,
 
-    instructions: `Delivery Method: ${
-      order.deliveryMethod === "atl" ? "Authorized to Leave" : "Hand to Hand"
-    }`,
+    instructions: `Delivery Method: ${order.deliveryMethod === "atl" ? "Authorized to Leave" : "Hand to Hand"}`,
     service_type: order.deliveryMethod === "atl" ? "Standard" : "Premium",
 
     webhook_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/detrack/webhook`,
+    group: ""
   }
 
   if (order.parcels.length > 0) {

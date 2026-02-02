@@ -49,6 +49,7 @@ export interface DetrackJobItem {
 }
 
 export interface DetrackJob {
+  group: string
   id?: string
   type: DetrackJobType
   do_number: string

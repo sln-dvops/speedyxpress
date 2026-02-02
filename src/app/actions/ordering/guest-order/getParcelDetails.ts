@@ -4,7 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 import type { ParcelDimensions } from "@/types/pricing";
 import { isShortId } from "@/utils/orderIdUtils";
 
-export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
+export async function getParcelDetails(
+  parcelIdOrShortId: string
+): Promise<{
   parcel: ParcelDimensions & {
     id: string;
     short_id?: string;
@@ -16,10 +18,6 @@ export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
     pricing_tier: string;
     detrack_job_id?: string;
     created_at: string;
-
-    // ✅ derived, explicit
-    volumetricWeight: number;
-    effectiveWeight: number;
   };
   order: {
     id: string;
@@ -60,11 +58,6 @@ export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
       return null;
     }
 
-    // --- derived weights (single source logic) ---
-    const volumetricWeight = (data.length * data.width * data.height) / 5000;
-
-    const effectiveWeight = Math.max(data.weight, volumetricWeight);
-
     const parcel: ParcelDimensions & {
       id: string;
       short_id?: string;
@@ -76,18 +69,15 @@ export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
       pricing_tier: string;
       detrack_job_id?: string;
       created_at: string;
-      volumetricWeight: number;
-      effectiveWeight: number;
     } = {
       id: data.id,
       short_id: data.short_id,
       weight: data.weight,
+
+      // dimensions kept only as raw metadata (not pricing)
       length: data.length,
       width: data.width,
       height: data.height,
-
-      volumetricWeight,
-      effectiveWeight,
 
       status: data.status,
       recipient_name: data.recipient_name,

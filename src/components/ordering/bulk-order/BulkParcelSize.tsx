@@ -1,10 +1,15 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useCallback } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 import { CsvUploader } from "@/components/ordering/bulk-order/CsvUploader"
@@ -30,29 +35,15 @@ export function ParcelDimensions({
   setSelectedDimensions,
   setRecipients,
 }: ParcelDimensionsProps) {
-  const [currentParcel, setCurrentParcel] = useState<ParcelDimensions>({
-    weight: 0,
-    length: 0,
-    width: 0,
-    height: 0,
-  })
+  const [currentParcel, setCurrentParcel] =
+    useState<ParcelDimensions>({ weight: 0 })
 
   const [parcels, setParcels] = useState<ParcelDimensions[]>(
     () => selectedDimensions ?? []
   )
 
-  const [volumetricWeight, setVolumetricWeight] = useState(0)
-  const [effectiveWeight, setEffectiveWeight] = useState(0)
-  const [editingIndex, setEditingIndex] = useState<number | null>(null)
-
-  // --- Derived weight calculations (UI only) ---
-  useEffect(() => {
-    const vw =
-      (currentParcel.length * currentParcel.width * currentParcel.height) / 5000
-
-    setVolumetricWeight(vw)
-    setEffectiveWeight(Math.max(currentParcel.weight, vw))
-  }, [currentParcel])
+  const [editingIndex, setEditingIndex] =
+    useState<number | null>(null)
 
   const handleDimensionChange = (
     field: keyof ParcelDimensions,
@@ -65,21 +56,11 @@ export function ParcelDimensions({
     }))
   }
 
-  const isValidDimensions = (dimensions: ParcelDimensions) => {
-    return (
-      dimensions.weight > 0 &&
-      dimensions.weight <= 30 &&
-      dimensions.length > 0 &&
-      dimensions.length <= 150 &&
-      dimensions.width > 0 &&
-      dimensions.width <= 150 &&
-      dimensions.height > 0 &&
-      dimensions.height <= 150
-    )
-  }
+  const isValidParcel = (parcel: ParcelDimensions) =>
+    parcel.weight > 0 && parcel.weight <= 30
 
   const handleAddParcel = () => {
-    if (!isValidDimensions(currentParcel)) return
+    if (!isValidParcel(currentParcel)) return
 
     if (editingIndex !== null) {
       const updated = [...parcels]
@@ -90,12 +71,7 @@ export function ParcelDimensions({
       setParcels([...parcels, currentParcel])
     }
 
-    setCurrentParcel({
-      weight: 0,
-      length: 0,
-      width: 0,
-      height: 0,
-    })
+    setCurrentParcel({ weight: 0 })
   }
 
   const handleEditParcel = (index: number) => {
@@ -109,10 +85,10 @@ export function ParcelDimensions({
   }
 
   const calculateTotalWeight = () =>
-    parcels.reduce((sum, parcel) => sum + parcel.weight, 0)
+    parcels.reduce((sum, p) => sum + p.weight, 0)
 
   const handleContinue = () => {
-    if (parcels.length > 0) {
+    if (parcels.length >= 2) {
       setSelectedDimensions(parcels)
       onNextStep()
     }
@@ -125,7 +101,9 @@ export function ParcelDimensions({
     [setRecipients]
   )
 
-  const handleSetParcelsFromCsv = (newParcels: ParcelDimensions[]) => {
+  const handleSetParcelsFromCsv = (
+    newParcels: ParcelDimensions[]
+  ) => {
     setParcels(newParcels)
   }
 
@@ -136,13 +114,14 @@ export function ParcelDimensions({
           Multiple Parcels Details
         </CardTitle>
 
-        <Badge variant="outline" className="bg-yellow-200 text-black border-black mt-2">
+        <Badge className="bg-yellow-200 text-black border-black mt-2">
           Multiple Parcels
         </Badge>
 
         {parcels.length > 0 && (
-          <Badge variant="outline" className="bg-yellow-100 text-black border-black mt-2">
-            {parcels.length} {parcels.length === 1 ? "Parcel" : "Parcels"}
+          <Badge className="bg-yellow-100 text-black border-black mt-2">
+            {parcels.length}{" "}
+            {parcels.length === 1 ? "Parcel" : "Parcels"}
           </Badge>
         )}
       </CardHeader>
@@ -150,29 +129,27 @@ export function ParcelDimensions({
       <CardContent className="space-y-6">
         <div className="bg-yellow-100 p-4 rounded-lg">
           <p className="text-sm text-gray-700">
-            Add multiple parcels by uploading the CSV files.
+            Add multiple parcels by uploading a CSV file.
+            Pricing is calculated based on weight only.
           </p>
         </div>
 
         <CsvUploader
           setParcels={handleSetParcelsFromCsv}
           setRecipients={handleSetRecipients}
-          isValidDimensions={isValidDimensions}
         />
 
         <div className="bg-yellow-100 p-4 rounded-lg">
           <p className="text-sm text-gray-700">
-            Add multiple parcels manually.
+            Or add parcels manually.
           </p>
         </div>
+
         <ParcelForm
           currentParcel={currentParcel}
           handleDimensionChange={handleDimensionChange}
           handleAddParcel={handleAddParcel}
-          isValidDimensions={isValidDimensions}
           editingIndex={editingIndex}
-          volumetricWeight={volumetricWeight}
-          effectiveWeight={effectiveWeight}
         />
 
         {parcels.length > 0 && (
@@ -195,6 +172,7 @@ export function ParcelDimensions({
         <Button variant="outline" onClick={onPrevStep}>
           Back
         </Button>
+
         <Button
           onClick={handleContinue}
           className="bg-black text-yellow-400"
@@ -206,7 +184,7 @@ export function ParcelDimensions({
 
       {parcels.length < 2 && (
         <p className="text-sm text-red-500 text-center mt-2">
-          Please add at least 2 parcels for this order.
+          Please add at least 2 parcels for a bulk order.
         </p>
       )}
     </Card>
