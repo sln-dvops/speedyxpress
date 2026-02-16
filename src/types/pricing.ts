@@ -95,6 +95,19 @@ export function calculateShippingPrice(
   return tier.price + handToHandFee
 }
 
+export function calculateFullParcelPrice(
+  parcel: ParcelDimensions,
+  deliveryMethod: DeliveryMethod,
+  postalCode?: string
+): number {
+  const base = calculateShippingPrice(parcel, deliveryMethod)
+  const surcharge = postalCode
+    ? calculateLocationSurcharge(postalCode)
+    : 0
+
+  return base + surcharge
+}
+
 /**
  * Determine the pricing tier name (T1, T2, T3, T4) based on parcel dimensions
  */

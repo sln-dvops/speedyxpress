@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog"
 
 import type { DeliveryMethod as DeliveryMethodType, ParcelDimensions } from "@/types/pricing"
-import { calculateShippingPrice, HAND_TO_HAND_FEE, determinePricingTier } from "@/types/pricing"
+import { calculateShippingPrice, HAND_TO_HAND_FEE, determinePricingTier, calculateLocationSurcharge } from "@/types/pricing"
 
 type DeliveryMethodProps = {
   onPrevStep: () => void
@@ -74,6 +74,22 @@ export function DeliveryMethod({
       : 0
 
   const totalPrice = totalBasePrice + totalHandToHandFee
+
+  const totalLocationSurcharge = selectedDimensions.reduce(
+  (sum, parcel, index) => {
+    const postalCode = orderDetails.isBulkOrder
+      ? orderDetails.recipients?.[index]?.recipientPostalCode
+      : orderDetails.recipientPostalCode
+
+    const surcharge = postalCode
+      ? calculateLocationSurcharge(postalCode)
+      : 0
+
+    return sum + surcharge
+  },
+  0
+)
+
 
   if (selectedDimensions.length === 0) {
     return (

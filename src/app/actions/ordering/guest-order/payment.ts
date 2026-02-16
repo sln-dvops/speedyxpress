@@ -1,6 +1,8 @@
 "use server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-import { createClient } from "@supabase/supabase-js";
 import {
   createHitPayRequestBody,
   HITPAY_API_ENDPOINT,
@@ -12,15 +14,12 @@ import type {
   RecipientDetails,
 } from "@/types/order";
 import type { ParcelDimensions } from "@/types/pricing";
-import { determinePricingTier, calculateShippingPrice } from "@/types/pricing";
-
-// Create a Supabase client with the service role key for admin operations
-const supabase = createClient(
+import { determinePricingTier, calculateShippingPrice, calculateLocationSurcharge, calculateFullParcelPrice } from "@/types/pricing";
+// Admin client (for writing to DB)
+const adminClient = createAdminClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: { persistSession: false },
-  },
+  { auth: { persistSession: false } }
 );
 
 // Update the createOrder function to handle recipients properly
@@ -29,6 +28,25 @@ export async function createOrder(
   parcels: ParcelDimensions[],
   recipients?: RecipientDetails[],
 ) {
+// Get logged-in user using session client
+const cookieStore = await cookies();
+
+const sessionClient = createServerClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    cookies: {
+      getAll: () => cookieStore.getAll(),
+      setAll: () => {},
+    },
+  }
+);
+
+const {
+  data: { user },
+} = await sessionClient.auth.getUser();
+
+
   try {
     console.log("Creating order with the following details:");
     console.log("Order Details:", JSON.stringify(orderDetails, null, 2));
@@ -53,11 +71,23 @@ export async function createOrder(
     }
 
     // Server-side price validation
-    const serverCalculatedPrice = parcels.reduce((total, parcel) => {
-      return (
-        total + calculateShippingPrice(parcel, orderDetails.deliveryMethod)
-      );
-    }, 0);
+  const serverCalculatedPrice = parcels.reduce((total, parcel, index) => {
+
+  const postalCode = orderDetails.isBulkOrder
+    ? recipients?.[index]?.postalCode
+    : orderDetails.recipientPostalCode
+
+  const parcelTotal = calculateFullParcelPrice(
+    parcel,
+    orderDetails.deliveryMethod,
+    postalCode
+  )
+
+  return total + parcelTotal
+
+}, 0)
+
+
 
     // Round to 2 decimal places for comparison
     const clientAmount = Math.round((orderDetails.amount || 0) * 100) / 100;
@@ -77,7 +107,7 @@ export async function createOrder(
     const finalAmount = serverAmount;
 
     // 1. Create the main order record
-    const { data: orderData, error: orderError } = await supabase
+    const { data: orderData, error: orderError } = await adminClient
       .from("orders")
       .insert({
         sender_name: orderDetails.senderName,
@@ -88,6 +118,7 @@ export async function createOrder(
         amount: finalAmount, // Use the validated server-calculated price
         status: "pending",
         is_bulk_order: orderDetails.isBulkOrder || false,
+        user_id: user?.id ?? null,
       })
       .select("id")
       .single();
@@ -101,7 +132,7 @@ export async function createOrder(
     console.log("Generated order ID:", orderId);
 
     // Fetch the short_id for this order
-    const { data: orderWithShortId, error: shortIdError } = await supabase
+    const { data: orderWithShortId, error: shortIdError } = await adminClient
       .from("orders")
       .select("short_id")
       .eq("id", orderId)
@@ -123,7 +154,7 @@ export async function createOrder(
         0,
       );
 
-      const { data: bulkOrderData, error: bulkOrderError } = await supabase
+      const { data: bulkOrderData, error: bulkOrderError } = await adminClient
         .from("bulk_orders")
         .insert({
           order_id: orderId,
@@ -187,7 +218,7 @@ export async function createOrder(
       // Calculate the pricing tier for this parcel
       const pricingTier = determinePricingTier(parcel);
 
-      const parcelInsert = supabase.from("parcels").insert({
+      const parcelInsert = adminClient.from("parcels").insert({
         order_id: orderId,
         bulk_order_id: bulkOrderId,
         parcel_size: `${parcel.weight}kg`,
