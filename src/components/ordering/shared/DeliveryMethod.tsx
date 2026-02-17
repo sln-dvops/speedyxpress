@@ -33,7 +33,7 @@ import type {
 import {
   calculateShippingPrice,
   PRICING_TIERS,
-  HAND_TO_HAND_FEE,
+  NEXT_DAY_FEE,
   getPricingTierByWeight,
 } from "@/types/pricing";
 
@@ -67,11 +67,11 @@ export function DeliveryMethod({
   const parcelDetails = selectedDimensions.map((parcel, index) => {
     const tier = getPricingTierByWeight(parcel.weight);
 
-    const basePrice = calculateShippingPrice(parcel, "atl");
+    const basePrice = calculateShippingPrice(parcel, "standard");
     const locationSurcharge = 0;
 
     const handToHandFee =
-      selectedDeliveryMethod === "hand-to-hand" ? HAND_TO_HAND_FEE : 0;
+      selectedDeliveryMethod === "next-day-delivery" ? NEXT_DAY_FEE : 0;
 
     return {
       parcelNumber: index + 1,
@@ -91,8 +91,8 @@ export function DeliveryMethod({
   );
 
   const totalHandToHandFee =
-    selectedDeliveryMethod === "hand-to-hand"
-      ? HAND_TO_HAND_FEE * parcelDetails.length
+    selectedDeliveryMethod === "next-day-delivery"
+      ? NEXT_DAY_FEE * parcelDetails.length
       : 0;
 
   const finalPrice =
@@ -152,10 +152,10 @@ export function DeliveryMethod({
           >
             <Label
               className={`${styles.methodOption} ${
-                selectedDeliveryMethod === "atl" ? styles.methodSelected : ""
+                selectedDeliveryMethod === "standard" ? styles.methodSelected : ""
               }`}
             >
-              <RadioGroupItem value="atl" className="sr-only" />
+              <RadioGroupItem value="standard" className="sr-only" />
               <div className="method-icon">
           <img src="/images/standard.png" alt="Next Day Delivery Icon" />
         </div>
@@ -180,12 +180,12 @@ export function DeliveryMethod({
 
             <Label
               className={`${styles.methodOption} ${
-                selectedDeliveryMethod === "hand-to-hand"
+                selectedDeliveryMethod === "next-day-delivery"
                   ? styles.methodSelected
                   : ""
               }`}
             >
-              <RadioGroupItem value="hand-to-hand" className="sr-only" />
+              <RadioGroupItem value="next-day-delivery" className="sr-only" />
               <div className="method-icon">
           <img src="/images/nextday.png" alt="Next Day Delivery Icon" />
         </div>
@@ -202,7 +202,7 @@ export function DeliveryMethod({
                   variant="outline"
                   className="border-2 border-black bg-yellow-100 text-black font-medium whitespace-nowrap"
                 >
-                  +${HAND_TO_HAND_FEE.toFixed(2)} per parcel
+                  +${NEXT_DAY_FEE.toFixed(2)} per parcel
                 </Badge>
               </div>
               
@@ -281,9 +281,9 @@ export function DeliveryMethod({
                         </p>
                       </div>
 
-                      {selectedDeliveryMethod === "hand-to-hand" && (
+                      {selectedDeliveryMethod === "next-day-delivery" && (
                         <div className="flex justify-between items-center mt-1">
-                          <p className="font-medium">Hand-to-Hand Fee:</p>
+                          <p className="font-medium">next-day-delivery Fee:</p>
                           <p className="text-lg text-green-600">
                             +${detail.handToHandFee.toFixed(2)}
                           </p>
@@ -309,10 +309,10 @@ export function DeliveryMethod({
             <p className="text-lg text-black">Base Price:</p>
             <p className="text-lg text-black">${totalBasePrice.toFixed(2)}</p>
           </div>
-          {selectedDeliveryMethod === "hand-to-hand" && (
+          {selectedDeliveryMethod === "next-day-delivery" && (
             <div className="flex justify-between items-center mt-2">
               <p className="text-lg text-black">
-                Nex-day Delivery Fee (${HAND_TO_HAND_FEE.toFixed(2)} ×{" "}
+                Nex-day Delivery Fee (${NEXT_DAY_FEE.toFixed(2)} ×{" "}
                 {parcelDetails.length}) :
               </p>
               <p className="text-lg text-green-600">

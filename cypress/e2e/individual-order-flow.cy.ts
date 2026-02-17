@@ -57,7 +57,7 @@ describe("Individual Order Flow", () => {
     cy.contains("button", "Continue to Delivery Method").click()
 
     // Step 3: Choose "Authorized to Leave" delivery method
-    cy.contains("Authorized to Leave (ATL)").closest("label").click()
+    cy.contains("Authorized to Leave (standard)").closest("label").click()
 
     // Check that the pricing tier is correctly displayed
     cy.contains("Show Details").click()
@@ -116,7 +116,7 @@ describe("Individual Order Flow", () => {
     cy.contains("Order Summary").should("be.visible")
     cy.contains("Sender:").next().should("contain", senderInfo.name)
     cy.contains("Recipient:").next().should("contain", "Jane Recipient")
-    cy.contains("Delivery Method:").next().should("contain", "atl")
+    cy.contains("Delivery Method:").next().should("contain", "standard")
 
     // Verify the total price matches our expected T2 price
     cy.contains("Total Price:").next().should("contain", "$5.80")

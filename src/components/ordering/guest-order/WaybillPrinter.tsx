@@ -122,7 +122,7 @@ export function WaybillPrinter({ orderDetails, parcel, recipient, waybillIndex }
             </tr>
             <tr>
               <td className="px-2 py-2" style={{ border: "1px solid black" }}>
-                {orderDetails.deliveryMethod === "atl" ? "ATL Delivery" : "Hand-to-Hand Delivery"}
+                {orderDetails.deliveryMethod === "standard" ? "Standard Delivery" : "Next Day Delivery"}
               </td>
               <td className="px-2 py-2 text-center" style={{ border: "1px solid black" }}>
                 -
@@ -139,7 +139,7 @@ export function WaybillPrinter({ orderDetails, parcel, recipient, waybillIndex }
         </div>
         <div className="text-right">
           <div className="text-8xl font-black" style={{ lineHeight: "0.9" }}>
-            {orderDetails.deliveryMethod === "atl" ? "ATL" : "HTH"}
+            {orderDetails.deliveryMethod === "standard" ? "Standard" : "Next Day Delivery"}
           </div>
         </div>
       </div>

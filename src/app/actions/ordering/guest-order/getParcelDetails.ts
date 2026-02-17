@@ -62,10 +62,6 @@ export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
       return null
     }
 
-    // Calculate volumetric weight
-    const volumetricWeight = (data.length * data.width * data.height) / 5000
-    const effectiveWeight = Math.max(data.weight, volumetricWeight)
-
     // Format the parcel data
     const parcel: ParcelDimensions & {
       id: string
@@ -82,10 +78,6 @@ export async function getParcelDetails(parcelIdOrShortId: string): Promise<{
       id: data.id,
       short_id: data.short_id,
       weight: data.weight,
-      length: data.length,
-      width: data.width,
-      height: data.height,
-      effectiveWeight: effectiveWeight,
       status: data.status,
       recipient_name: data.recipient_name,
       recipient_address: data.recipient_address,

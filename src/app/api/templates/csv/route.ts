@@ -75,7 +75,8 @@ export async function GET(request: NextRequest) {
  */
 function getStaticCsvTemplate(): string {
   // Return a basic CSV template with header and example rows
-  return `weight,length,width,height,name,contactNumber,email,street,unitNo,postalCode
-5,30,20,15,John Doe,12345678,john@example.com,123 Main St,#01-01,123456
-10,40,30,20,Jane Smith,87654321,jane@example.com,456 Elm St,#02-02,654321`
+  return `weight,name,contactNumber,email,street,unitNo,postalCode
+5,John Doe,12345678,john@example.com,123 Main St,#01-01,123456
+10,Jane Smith,87654321,jane@example.com,456 Elm St,#02-02,654321`
+
 }

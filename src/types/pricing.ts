@@ -1,6 +1,6 @@
 export type ParcelSize = "2kg" | "5kg" | "10kg"
 export type CollectionMethod = "dropoff" | "pickup"
-export type DeliveryMethod = "atl" | "hand-to-hand"
+export type DeliveryMethod = "standard" | "next-day-delivery"
 // ParcelDimensions (future-safe)
 export interface ParcelDimensions {
   weight: number
@@ -63,7 +63,7 @@ export function calculateLocationSurcharge(postalCode: string): number {
 }
 
 
-export const HAND_TO_HAND_FEE = 2.5
+export const NEXT_DAY_FEE = 2.5
 /**
  * SINGLE SOURCE OF TRUTH
  * Determines pricing tier based ONLY on actual weight
@@ -91,7 +91,7 @@ export function calculateShippingPrice(
   deliveryMethod: DeliveryMethod
 ): number {
   const tier = getPricingTierByWeight(dimensions.weight)
-  const handToHandFee = deliveryMethod === "hand-to-hand" ? HAND_TO_HAND_FEE : 0
+  const handToHandFee = deliveryMethod === "next-day-delivery" ? NEXT_DAY_FEE : 0
   return tier.price + handToHandFee
 }
 

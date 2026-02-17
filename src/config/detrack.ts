@@ -71,8 +71,8 @@ export function convertOrderToDetrackJob(order: OrderWithParcels): DetrackJob {
     parcel_height: firstParcel.height,
 
     // Additional details
-    instructions: `Delivery Method: ${order.deliveryMethod === "atl" ? "Authorized to Leave" : "Hand to Hand"}`,
-    service_type: order.deliveryMethod === "atl" ? "Standard" : "Premium",
+    instructions: `Delivery Method: ${order.deliveryMethod === "standard" ? "Standard Delivery" : "Next Day Delivery"}`,
+    service_type: order.deliveryMethod === "standard" ? "Standard" : "Premium",
 
     // Webhook for status updates
     webhook_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/detrack/webhook`,
