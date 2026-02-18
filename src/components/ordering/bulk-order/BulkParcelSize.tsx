@@ -168,14 +168,14 @@ export function ParcelDimensions({
         )}
       </CardContent>
 
-      <CardFooter className="px-6 py-4 flex justify-between">
-        <Button variant="outline" onClick={onPrevStep}>
+      <CardFooter className="px-4 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 sm:flex-row sm:justify-between">
+        <Button variant="outline" onClick={onPrevStep} className="w-full sm:w-auto">
           Back
         </Button>
 
         <Button
           onClick={handleContinue}
-          className="bg-black text-yellow-400"
+          className="w-full sm:w-auto bg-black text-yellow-400"
           disabled={parcels.length < 2}
         >
           Continue
