@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react"
 import { useSgAddressAutocomplete, type AddressSuggestion } from "@/hooks/useSgAddressAutocomplete"
 
 type Props = {
+  onBlur?: () => void
+
   value: string
   onChange: (val: string) => void
 
@@ -20,6 +22,7 @@ export function AddressAutocompleteInput({
   value,
   onChange,
   onSelect,
+  onBlur,
   placeholder = "Enter address",
   disabled,
   inputClassName
@@ -48,6 +51,7 @@ export function AddressAutocompleteInput({
   return (
     <div ref={wrapperRef} className="relative">
       <input
+      onBlur={onBlur}
         value={value}
         disabled={disabled}
         onFocus={() => setOpen(true)}
