@@ -52,11 +52,17 @@ export async function getDetrackStatus(idParam: string): Promise<DetrackStatusRe
 
     // First, determine if this is an order ID or a parcel ID
     // Try to find it in the parcels table first
-    const { data: parcelData } = await supabase
-      .from("parcels")
-      .select("id, order_id, short_id, status")
-      .eq("id", idParam)
-      .maybeSingle()
+    // Always try parcel short_id first
+const { data: parcelData } = await supabase
+  .from("parcels")
+  .select("id, order_id, short_id")
+  .eq("short_id", idParam)
+  .maybeSingle()
+
+if (parcelData) {
+  return getDetrackStatusForParcel(parcelData.id, parcelData)
+}
+
 
     // If found in parcels table, use the parcel workflow
     if (parcelData) {

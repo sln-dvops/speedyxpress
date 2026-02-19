@@ -33,7 +33,7 @@ import type {
 import {
   calculateShippingPrice,
   PRICING_TIERS,
-  HAND_TO_HAND_FEE,
+  NEXT_DAY_FEE,
   getPricingTierByWeight,
 } from "@/types/pricing";
 
@@ -67,11 +67,11 @@ export function DeliveryMethod({
   const parcelDetails = selectedDimensions.map((parcel, index) => {
     const tier = getPricingTierByWeight(parcel.weight);
 
-    const basePrice = calculateShippingPrice(parcel, "atl");
+    const basePrice = calculateShippingPrice(parcel, "standard");
     const locationSurcharge = 0;
 
     const handToHandFee =
-      selectedDeliveryMethod === "hand-to-hand" ? HAND_TO_HAND_FEE : 0;
+      selectedDeliveryMethod === "next-day-delivery" ? NEXT_DAY_FEE : 0;
 
     return {
       parcelNumber: index + 1,
@@ -91,8 +91,8 @@ export function DeliveryMethod({
   );
 
   const totalHandToHandFee =
-    selectedDeliveryMethod === "hand-to-hand"
-      ? HAND_TO_HAND_FEE * parcelDetails.length
+    selectedDeliveryMethod === "next-day-delivery"
+      ? NEXT_DAY_FEE * parcelDetails.length
       : 0;
 
   const finalPrice =
@@ -114,7 +114,7 @@ export function DeliveryMethod({
           <Button
             variant="outline"
             onClick={onPrevStep}
-            className="border-black text-black hover:bg-yellow-100"
+            className="w-full sm:w-auto border-black text-black hover:bg-yellow-100"
           >
             Back
           </Button>
@@ -138,7 +138,8 @@ export function DeliveryMethod({
           </Badge>
         )}
       </CardHeader>
-      <CardContent className="">
+      <CardContent className="p-4 sm:p-6">
+
         <div>
           <h3 className="font-medium text-lg text-black mb-4">
             Choose Your Delivery Method
@@ -152,14 +153,15 @@ export function DeliveryMethod({
           >
             <Label
               className={`${styles.methodOption} ${
-                selectedDeliveryMethod === "atl" ? styles.methodSelected : ""
+                selectedDeliveryMethod === "standard" ? styles.methodSelected : ""
               }`}
             >
-              <RadioGroupItem value="atl" className="sr-only" />
+              <RadioGroupItem value="standard" className="sr-only" />
               <div className="method-icon">
           <img src="/images/standard.png" alt="Next Day Delivery Icon" />
         </div>
-              <div className="grid grid-cols-[1fr,auto] gap-3 items-center">
+              <div className="grid gap-3 items-start sm:grid-cols-[1fr,auto]">
+
                 <div>
                   <p className="font-medium text-black">
                     Standard Delivery
@@ -180,12 +182,12 @@ export function DeliveryMethod({
 
             <Label
               className={`${styles.methodOption} ${
-                selectedDeliveryMethod === "hand-to-hand"
+                selectedDeliveryMethod === "next-day-delivery"
                   ? styles.methodSelected
                   : ""
               }`}
             >
-              <RadioGroupItem value="hand-to-hand" className="sr-only" />
+              <RadioGroupItem value="next-day-delivery" className="sr-only" />
               <div className="method-icon">
           <img src="/images/nextday.png" alt="Next Day Delivery Icon" />
         </div>
@@ -202,7 +204,7 @@ export function DeliveryMethod({
                   variant="outline"
                   className="border-2 border-black bg-yellow-100 text-black font-medium whitespace-nowrap"
                 >
-                  +${HAND_TO_HAND_FEE.toFixed(2)} per parcel
+                  +${NEXT_DAY_FEE.toFixed(2)} per parcel
                 </Badge>
               </div>
               
@@ -210,7 +212,7 @@ export function DeliveryMethod({
           </RadioGroup>
         </div>
 
-        <div className="mt-4 p-4 bg-yellow-100 rounded-lg">
+        <div className="mt-4 p-3 sm:p-4 bg-yellow-100 rounded-lg">
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-medium text-lg text-black">Order Summary</h4>
             <Button
@@ -281,9 +283,9 @@ export function DeliveryMethod({
                         </p>
                       </div>
 
-                      {selectedDeliveryMethod === "hand-to-hand" && (
+                      {selectedDeliveryMethod === "next-day-delivery" && (
                         <div className="flex justify-between items-center mt-1">
-                          <p className="font-medium">Hand-to-Hand Fee:</p>
+                          <p className="font-medium">next-day-delivery Fee:</p>
                           <p className="text-lg text-green-600">
                             +${detail.handToHandFee.toFixed(2)}
                           </p>
@@ -309,10 +311,10 @@ export function DeliveryMethod({
             <p className="text-lg text-black">Base Price:</p>
             <p className="text-lg text-black">${totalBasePrice.toFixed(2)}</p>
           </div>
-          {selectedDeliveryMethod === "hand-to-hand" && (
+          {selectedDeliveryMethod === "next-day-delivery" && (
             <div className="flex justify-between items-center mt-2">
               <p className="text-lg text-black">
-                Nex-day Delivery Fee (${HAND_TO_HAND_FEE.toFixed(2)} ×{" "}
+                Nex-day Delivery Fee (${NEXT_DAY_FEE.toFixed(2)} ×{" "}
                 {parcelDetails.length}) :
               </p>
               <p className="text-lg text-green-600">
@@ -360,17 +362,18 @@ export function DeliveryMethod({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="px-6 py-4 flex justify-between">
+      <CardFooter className="px-4 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 sm:flex-row sm:justify-between">
         <Button
           variant="outline"
           onClick={onPrevStep}
-          className="border-black text-black hover:bg-yellow-100"
+          className="w-full sm:w-auto border-black text-black hover:bg-yellow-100"
         >
           Back
         </Button>
         <Button
           onClick={onNextStep}
-          className="bg-black hover:bg-black/90 text-yellow-400"
+           className="w-full sm:w-auto bg-black hover:bg-black/90 text-yellow-400"
+
           disabled={!selectedDeliveryMethod}
         >
           Next

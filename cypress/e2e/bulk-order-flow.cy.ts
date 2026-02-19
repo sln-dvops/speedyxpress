@@ -64,7 +64,7 @@ describe("Bulk Order Flow", () => {
     cy.contains("button", "Continue to Delivery Method").click()
 
     // Step 3: Choose "Authorized to Leave" delivery method
-    cy.contains("Authorized to Leave (ATL)").closest("label").click()
+    cy.contains("Authorized to Leave (standard)").closest("label").click()
     cy.contains("button", "Next").click()
 
     // Step 4: Fill in sender information (Singapore address)
@@ -153,7 +153,7 @@ describe("Bulk Order Flow", () => {
     cy.contains("Order Summary").should("be.visible")
     cy.contains("Sender:").next().should("contain", senderInfo.name)
     cy.contains("Recipient:").next().should("contain", "Multiple")
-    cy.contains("Delivery Method:").next().should("contain", "atl")
+    cy.contains("Delivery Method:").next().should("contain", "standard")
     cy.contains("Parcels:").next().should("contain", "2")
 
     // Click proceed to payment
