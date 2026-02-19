@@ -210,13 +210,11 @@ textarea:-moz-autofill {
 
 /* Parcel Form Layout */
 .parcel-form {
-  /* display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem; */
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   margin: 0 auto;
-  font-family: 'Poppings',sans-serif;
 }
+
 
 @media (min-width: 768px) {
   .parcel-form {
@@ -324,6 +322,87 @@ textarea:-moz-autofill {
   font-size: 0.9rem;
   color: #555;
   line-height: 1.5;
+}
+/* ============================= */
+/* Tablet (≤ 1024px) */
+/* ============================= */
+@media (max-width: 1024px) {
+  .parcel-form {
+    max-width: 600px;
+    padding: 0 1rem;
+  }
+}
+
+
+/* ============================= */
+/* Mobile (≤ 768px) */
+/* ============================= */
+@media (max-width: 768px) {
+  .parcel-form {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  .parcel-label {
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .parcel-dimension-grid {
+    grid-template-columns: 1fr 1fr; /* 2 columns instead of 3 */
+    gap: 0.75rem;
+  }
+
+  .parcel-input {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .parcel-button {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+
+  .parcel-info,
+  .infoBox {
+    padding: 14px;
+  }
+
+  .parcel-info p,
+  .infoText {
+    font-size: 0.85rem;
+  }
+}
+
+
+/* ============================= */
+/* Small Mobile (≤ 480px) */
+/* ============================= */
+@media (max-width: 480px) {
+  .parcel-form {
+    padding: 0 0.75rem;
+  }
+
+  .parcel-dimension-grid {
+    grid-template-columns: 1fr; /* Stack fully */
+  }
+
+  .parcel-label {
+    font-size: 0.9rem;
+  }
+
+  .parcel-input {
+    font-size: 0.85rem;
+  }
+
+  .parcel-button {
+    font-size: 0.9rem;
+  }
+
+  .parcel-error {
+    font-size: 0.8rem;
+    padding: 0.85rem;
+  }
 }
 
 /* ===============================
@@ -536,6 +615,7 @@ textarea:-moz-autofill {
   color: #ef4444;
   margin-top: 4px;
 }
+
 .auth-container {
   max-width: 850px;
   margin: 80px auto;
@@ -666,22 +746,96 @@ button:disabled {
 .footer-text span:hover {
   text-decoration: underline;
 }
-
-/* 📱 Mobile responsiveness */
-@media (max-width: 480px) {
+/* ============================= */
+/* Tablet (≤ 1024px) */
+/* ============================= */
+@media (max-width: 1024px) {
   .auth-container {
-    margin: 40px 16px;
-    padding: 28px 22px;
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 28px;
+  }
+
+  .auth-container h1 {
+    font-size: 1.6rem;
+  }
+}
+
+
+/* ============================= */
+/* Mobile (≤ 768px) */
+/* ============================= */
+@media (max-width: 768px) {
+  .auth-container {
+    max-width: 95%;
+    margin: 40px auto;
+    padding: 22px;
+    border-radius: 14px;
   }
 
   .logo-wrapper img {
-    height: 40px;
+    width: 100px;
   }
 
   .auth-container h1 {
     font-size: 1.5rem;
   }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .auth-form input {
+    font-size: 0.9rem;
+    padding: 11px 12px;
+  }
+
+  .auth-form button {
+    font-size: 0.9rem;
+    padding: 11px;
+  }
+
+  .footer-text {
+    font-size: 0.9rem;
+  }
 }
+
+
+/* ============================= */
+/* Small Mobile (≤ 480px) */
+/* ============================= */
+@media (max-width: 480px) {
+  .auth-container {
+    margin: 20px 16px;
+    padding: 18px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .logo-wrapper img {
+    width: 85px;
+  }
+
+  .auth-container h1 {
+    font-size: 1.35rem;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
+
+  .auth-form input {
+    font-size: 0.85rem;
+  }
+
+  .auth-form button {
+    font-size: 0.85rem;
+  }
+
+  .error {
+    font-size: 0.85rem;
+  }
+}
+
 
 /* =========================
    Order Page Header
@@ -778,13 +932,11 @@ button:disabled {
 
   .dashboard-link,
   .logout-button {
+    text-align: center;
     padding: 6px 10px;
     font-size: 0.85rem;
   }
 
-  .order-page-content {
-    padding: 24px 16px;
-  }
 }
 
 .guest-section {

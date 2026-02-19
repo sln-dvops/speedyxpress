@@ -46,39 +46,34 @@ export function ParcelList({ parcels }: { parcels: Parcel[] }) {
       <div className="space-y-4">
         {filteredParcels.map((parcel) => (
           <div
-            key={parcel.id}
-            className="bg-white rounded-lg shadow p-6 flex justify-between"
-          >
-            <div>
-              <p className="text-l text-black">
-                TRACKING ID:{" "}
-                <span className="font-semibold">
-                  {parcel.short_id}
-                </span>
-              </p>
+  key={parcel.id}
+  className="bg-white rounded-lg shadow p-4 sm:p-6 flex flex-col sm:flex-row justify-between gap-3 sm:gap-0"
+>
+  <div>
+    <p className="text-sm sm:text-base text-black">
+      TRACKING ID:{" "}
+      <span className="font-semibold">{parcel.short_id}</span>
+    </p>
 
-              <p className="text-sm text-gray-500">
-                Recipient: {parcel.recipient_name}
-              </p>
+    <p className="text-xs sm:text-sm text-gray-500">
+      Recipient: {parcel.recipient_name}
+    </p>
 
-              <p className="text-sm text-gray-500">
-                {parcel.recipient_address}
-              </p>
+    <p className="text-xs sm:text-sm text-gray-500">
+      {parcel.recipient_address}
+    </p>
+  </div>
 
-              <p className="text-xs text-gray-400 mt-2">
-                Weight: {parcel.weight} kg • Tier: {parcel.pricing_tier}
-              </p>
-            </div>
+  <div className="flex items-center mt-2 sm:mt-0">
+    <Link
+      href={`/order/${parcel.order_short_id}`}
+      className="dashboard-link"
+    >
+      View Order
+    </Link>
+  </div>
+</div>
 
-            <div className="flex items-center">
-              <Link
-                href={`/order/${parcel.order_short_id}`}
-                className="dashboard-link"
-              >
-                View Order
-              </Link>
-            </div>
-          </div>
         ))}
       </div>
     </>

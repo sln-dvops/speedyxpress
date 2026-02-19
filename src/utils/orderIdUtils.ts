@@ -5,14 +5,29 @@
 /**
  * Checks if the provided ID is a short ID (12 hexadecimal characters with optional "SPD" prefix)
  */
+// export function isShortId(id: string): boolean {
+//   // Check for SPD prefix followed by 12 hex characters
+//   if (id.startsWith("SPD") && id.length === 16 && !/[^a-f0-9]/i.test(id.substring(4))) {
+//     return true
+//   }
+//   // Also support the original format (just 12 hex characters)
+//   return id.length === 12 && !/[^a-f0-9]/i.test(id)
+// }
+
 export function isShortId(id: string): boolean {
-  // Check for SPD prefix followed by 12 hex characters
+  // New tracking number format
+  if (/^SPD\d{10}$/.test(id)) {
+    return true
+  }
+
+  // Old 12-hex format
   if (id.startsWith("SPD") && id.length === 16 && !/[^a-f0-9]/i.test(id.substring(4))) {
     return true
   }
-  // Also support the original format (just 12 hex characters)
+
   return id.length === 12 && !/[^a-f0-9]/i.test(id)
 }
+
 
 /**
  * Checks if the provided ID is a valid UUID with hyphens
@@ -77,6 +92,11 @@ export function validateOrderId(id: string): string | null {
   // Not a valid order ID
   return null
 }
+
+export function isTrackingNumber(id: string): boolean {
+  return /^SPD\d{10}$/.test(id)
+}
+
 
 /**
  * Extracts the short ID from a full UUID (last 12 characters)

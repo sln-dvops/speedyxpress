@@ -114,7 +114,7 @@ export function DeliveryMethod({
           <Button
             variant="outline"
             onClick={onPrevStep}
-            className="border-black text-black hover:bg-yellow-100"
+            className="w-full sm:w-auto border-black text-black hover:bg-yellow-100"
           >
             Back
           </Button>
@@ -138,7 +138,8 @@ export function DeliveryMethod({
           </Badge>
         )}
       </CardHeader>
-      <CardContent className="">
+      <CardContent className="p-4 sm:p-6">
+
         <div>
           <h3 className="font-medium text-lg text-black mb-4">
             Choose Your Delivery Method
@@ -159,7 +160,8 @@ export function DeliveryMethod({
               <div className="method-icon">
           <img src="/images/standard.png" alt="Next Day Delivery Icon" />
         </div>
-              <div className="grid grid-cols-[1fr,auto] gap-3 items-center">
+              <div className="grid gap-3 items-start sm:grid-cols-[1fr,auto]">
+
                 <div>
                   <p className="font-medium text-black">
                     Standard Delivery
@@ -210,7 +212,7 @@ export function DeliveryMethod({
           </RadioGroup>
         </div>
 
-        <div className="mt-4 p-4 bg-yellow-100 rounded-lg">
+        <div className="mt-4 p-3 sm:p-4 bg-yellow-100 rounded-lg">
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-medium text-lg text-black">Order Summary</h4>
             <Button
@@ -360,17 +362,18 @@ export function DeliveryMethod({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="px-6 py-4 flex justify-between">
+      <CardFooter className="px-4 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 sm:flex-row sm:justify-between">
         <Button
           variant="outline"
           onClick={onPrevStep}
-          className="border-black text-black hover:bg-yellow-100"
+          className="w-full sm:w-auto border-black text-black hover:bg-yellow-100"
         >
           Back
         </Button>
         <Button
           onClick={onNextStep}
-          className="bg-black hover:bg-black/90 text-yellow-400"
+           className="w-full sm:w-auto bg-black hover:bg-black/90 text-yellow-400"
+
           disabled={!selectedDeliveryMethod}
         >
           Next

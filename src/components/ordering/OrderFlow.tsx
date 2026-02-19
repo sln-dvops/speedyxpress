@@ -21,23 +21,26 @@ export function OrderFlow({ user }: { user: any }) {
   }
 
   return (
-    <div className="min-h-screen bg-yellow-400">
-      <div className="container mx-auto max-w-[1000px] px-4 pt-8">
+    <div className="min-h-screen bg-yellow-400 px-3 sm:px-0">
+      <div className="container mx-auto max-w-[1000px] px-4 pt-6 md:pt-8">
         {/* Header */}
         <header className="mb-6">
-  <div className="mb-8 flex items-center justify-between rounded-xl bg-white px-6 py-4 backdrop-blur-md shadow">
-    
+  <div className="mb-8 flex flex-col gap-4 rounded-xl bg-white px-4 py-4 shadow 
+                md:flex-row md:items-center md:justify-between md:px-6">
+
     {user ? (
       <>
         {/* Logged-in state */}
-        <p className="text-2xl text-black-700">
+        <p className="text-lg md:text-2xl text-black-700 text-center md:text-left">
+
           Welcome back,{" "}
           <span className="text-2xl text-black-700">
             {user.user_metadata?.display_name ?? "User"}.
           </span>
         </p>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center">
+
           <a href="/dashboard" className="dashboard-link">
                     Dashboard
                   </a>
@@ -46,11 +49,13 @@ export function OrderFlow({ user }: { user: any }) {
             <button
               type="submit"
               className="
-                rounded-lg bg-black px-4 py-2
-                text-sm font-medium text-white
-                hover:bg-red-600
-                cursor-pointer
-              "
+  w-full md:w-auto
+  rounded-lg bg-black px-4 py-2
+  text-sm font-medium text-white
+  hover:bg-red-600
+  transition
+"
+
             >
               Logout
             </button>
@@ -60,12 +65,14 @@ export function OrderFlow({ user }: { user: any }) {
     ) : (
       <>
         {/* Guest state */}
-        <p className="text-xl text-black-700">
+        <p className="text-lg md:text-2xl text-black-700 text-center md:text-left">
+
           Welcome to Speedy Express !
           
         </p>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center">
+
           <a href="/login" className="dashboard-link">
                     Log In
                   </a>
