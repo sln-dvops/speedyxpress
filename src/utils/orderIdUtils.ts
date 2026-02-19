@@ -24,6 +24,7 @@ export function isShortId(id: string): boolean {
   if (id.startsWith("SPD") && id.length === 16 && !/[^a-f0-9]/i.test(id.substring(4))) {
     return true
   }
+  
 
   return id.length === 12 && !/[^a-f0-9]/i.test(id)
 }

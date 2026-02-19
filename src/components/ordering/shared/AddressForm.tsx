@@ -57,6 +57,8 @@ export function AddressForm({
     }
   }, [])
 
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     const updatedData = { ...formData, [name]: value }
@@ -94,11 +96,12 @@ export function AddressForm({
           name="name"
           value={formData.name}
           onChange={handleChange}
+          onBlur={() => setTouched(prev => ({ ...prev, name: true }))}
           placeholder="Name"
-          className={validationResult.errors.name ? "error" : ""}
+          className={touched.name && validationResult.errors.name ? "error" : ""}
         />
         <span>Name</span>
-        {validationResult.errors.name && (
+        {touched.name && validationResult.errors.name && (
           <p className="error-text">{validationResult.errors.name}</p>
         )}
       </div>
@@ -109,11 +112,12 @@ export function AddressForm({
           name="contactNumber"
           value={formData.contactNumber}
           onChange={handleChange}
+          onBlur={() => setTouched(prev => ({ ...prev, contactNumber: true }))}
           placeholder="Phone number"
-          className={validationResult.errors.contactNumber ? "error" : ""}
+          className={touched.contactNumber && validationResult.errors.contactNumber ? "error" : ""}
         />
         <span>Phone number</span>
-        {validationResult.errors.contactNumber && (
+        {touched.contactNumber && validationResult.errors.contactNumber && (
           <p className="error-text">{validationResult.errors.contactNumber}</p>
         )}
       </div>
@@ -127,11 +131,12 @@ export function AddressForm({
           name="email"
           value={formData.email}
           onChange={handleChange}
+          onBlur={() => setTouched(prev => ({ ...prev, email: true }))}
           placeholder="Email"
-          className={validationResult.errors.email ? "error" : ""}
+          className={touched.email && validationResult.errors.email ? "error" : ""}
         />
         <span>Email</span>
-        {validationResult.errors.email && (
+        {touched.email && validationResult.errors.email && (
           <p className="error-text">{validationResult.errors.email}</p>
         )}
       </div>
@@ -140,36 +145,42 @@ export function AddressForm({
     {/* Address (FULL WIDTH) */}
     <div className="address-grid one">
       <div className="field">
-        <AddressAutocompleteInput
-          value={formData.street}
-          inputClassName={`${
-            validationResult.errors.street ? "error" : ""
-          }`}
-          placeholder="Address"
-          onChange={(val) => {
-            const updated = { ...formData, street: val }
-            setFormData(updated)
-            onDataChange(updated)
-          }}
-          onSelect={(s) => {
-            const updated = {
-              ...formData,
-              street: s.address,
-              postalCode: s.postalCode,
-            }
+  <AddressAutocompleteInput
+    value={formData.street}
+    inputClassName={`${
+      touched.street && validationResult.errors.street ? "error" : ""
+    }`}
+    placeholder="Address"
+    onChange={(val) => {
+      const updated = { ...formData, street: val }
+      setFormData(updated)
+      onDataChange(updated)
+    }}
+    onBlur={() =>
+      setTouched((prev) => ({ ...prev, street: true }))
+    }
+    onSelect={(s) => {
+      const updated = {
+        ...formData,
+        street: s.address,
+        postalCode: s.postalCode,
+      }
 
-            setFormData(updated)
-            onDataChange(updated)
+      setFormData(updated)
+      onDataChange(updated)
+      setTouched((prev) => ({ ...prev, street: true }))
 
-            const result = validateSingaporeAddress(updated)
-            setValidationResult(result)
-            onValidityChange(result.isValid)
-          }}
-        />
-        {validationResult.errors.street && (
-          <p className="error-text">{validationResult.errors.street}</p>
-        )}
-      </div>
+      const result = validateSingaporeAddress(updated)
+      setValidationResult(result)
+      onValidityChange(result.isValid)
+    }}
+  />
+
+  {touched.street && validationResult.errors.street && (
+    <p className="error-text">{validationResult.errors.street}</p>
+  )}
+</div>
+
     </div>
 
     {/* Unit + Postal */}
@@ -180,11 +191,12 @@ export function AddressForm({
           name="unitNo"
           value={formData.unitNo}
           onChange={handleChange}
+          onBlur={() => setTouched(prev => ({ ...prev, unitNo: true }))}
           placeholder="Unit"
           className={validationResult.errors.unitNo ? "error" : ""}
         />
         <span>Unit</span>
-        {validationResult.errors.unitNo && (
+        {touched.unitNo && validationResult.errors.unitNo && (
           <p className="error-text">{validationResult.errors.unitNo}</p>
         )}
       </div>
@@ -195,11 +207,12 @@ export function AddressForm({
           name="postalCode"
           value={formData.postalCode}
           onChange={handleChange}
+          onBlur={() => setTouched(prev => ({ ...prev, postalCode: true }))}
           placeholder="Postal code"
-          className={validationResult.errors.postalCode ? "error" : ""}
+          className={touched.postalCode && validationResult.errors.postalCode ? "error" : ""}
         />
         <span>Postal code</span>
-        {validationResult.errors.postalCode && (
+        {touched.postalCode && validationResult.errors.postalCode && (
           <p className="error-text">{validationResult.errors.postalCode}</p>
         )}
       </div>

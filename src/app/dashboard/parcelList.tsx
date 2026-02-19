@@ -20,16 +20,24 @@ export function ParcelList({ parcels }: { parcels: Parcel[] }) {
   const [query, setQuery] = useState("")
 
   const filteredParcels = useMemo(() => {
-    if (!query) return parcels
-    const q = query.toLowerCase()
+  const sorted = [...parcels].sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() -
+      new Date(a.created_at).getTime()
+  )
 
-    return parcels.filter(
-      (p) =>
-        p.short_id.toLowerCase().includes(q) ||
-        p.recipient_name.toLowerCase().includes(q) ||
-        p.recipient_address.toLowerCase().includes(q)
-    )
-  }, [query, parcels])
+  if (!query) return sorted
+
+  const q = query.toLowerCase()
+
+  return sorted.filter(
+    (p) =>
+      p.short_id.toLowerCase().includes(q) ||
+      p.recipient_name.toLowerCase().includes(q) ||
+      p.recipient_address.toLowerCase().includes(q)
+  )
+}, [query, parcels])
+
 
   return (
     <>
