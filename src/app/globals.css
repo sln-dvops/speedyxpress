@@ -1056,3 +1056,21 @@ table td, table th {
 .waybill-table td .label-bold {
   font-weight: bold;
 }
+
+.waybill-scale {
+  width: 100mm;
+  height: 150mm;
+  transform-origin: top center;
+}
+
+@media (max-width: 640px) {
+  .waybill-scale {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 400px) {
+  .waybill-scale {
+    transform: scale(0.8);
+  }
+}
