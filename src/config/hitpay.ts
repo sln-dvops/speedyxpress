@@ -17,7 +17,8 @@ export function createHitPayRequestBody(orderDetails: any) {
   return {
     amount: orderDetails.amount,
     currency: "SGD",
-    payment_methods: ["paynow_online", "card"],
+    // payment_methods: ["paynow_online", "card"],
+    payment_methods: ["paynow_online"],
     email: orderDetails.senderEmail,
     name: orderDetails.senderName,
     phone: orderDetails.senderContactNumber,
