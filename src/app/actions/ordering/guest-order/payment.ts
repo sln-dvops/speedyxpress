@@ -254,38 +254,38 @@ const {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const redirectUrl = `${baseUrl}/order/${orderShortId}`;
 
-    // const hitPayRequestBody = createHitPayRequestBody({
-    //   ...orderDetails,
-    //   orderNumber: orderShortId, // Use short_id instead of full UUID
-    //   redirectUrl: redirectUrl, // Override the default redirect URL
-    //   amount: finalAmount, // Use the validated server-calculated price
-    // });
+    const hitPayRequestBody = createHitPayRequestBody({
+      ...orderDetails,
+      orderNumber: orderShortId, // Use short_id instead of full UUID
+      redirectUrl: redirectUrl, // Override the default redirect URL
+      amount: finalAmount, // Use the validated server-calculated price
+    });
 
-    // console.log(
-    //   "HitPay request body:",
-    //   JSON.stringify(hitPayRequestBody, null, 2),
-    // );
-    // console.log("Using HitPay API endpoint:", HITPAY_API_ENDPOINT);
+    console.log(
+      "HitPay request body:",
+      JSON.stringify(hitPayRequestBody, null, 2),
+    );
+    console.log("Using HitPay API endpoint:", HITPAY_API_ENDPOINT);
 
-    // const hitPayResponse = await fetch(HITPAY_API_ENDPOINT, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "X-BUSINESS-API-KEY": process.env.HITPAY_API_KEY || "",
-    //     "X-Requested-With": "XMLHttpRequest",
-    //   },
-    //   body: JSON.stringify(hitPayRequestBody),
-    // });
-    // if (process.env.NEXT_PUBLIC_MOCK_PAYMENT === "true") {
-    //   console.log("⚠️ MOCK PAYMENT ENABLED");
+    const hitPayResponse = await fetch(HITPAY_API_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-BUSINESS-API-KEY": process.env.HITPAY_API_KEY || "",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify(hitPayRequestBody),
+    });
+    if (process.env.NEXT_PUBLIC_MOCK_PAYMENT === "true") {
+      console.log("⚠️ MOCK PAYMENT ENABLED");
 
-    //   return {
-    //     success: true,
-    //     orderId,
-    //     orderShortId,
-    //     paymentUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order/${orderShortId}`,
-    //   };
-    // }
+      return {
+        success: true,
+        orderId,
+        orderShortId,
+        paymentUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order/${orderShortId}`,
+      };
+    }
 
 //     if (!hitPayResponse.ok) {
 //       const errorText = await hitPayResponse.text();
@@ -294,15 +294,15 @@ const {
 // ${errorText}`);
 //     }
 
-    // const hitPayData: HitPayResponse = await hitPayResponse.json();
-    // console.log("HitPay API response:", JSON.stringify(hitPayData, null, 2));
+    const hitPayData: HitPayResponse = await hitPayResponse.json();
+    console.log("HitPay API response:", JSON.stringify(hitPayData, null, 2));
 
-    // return {
-    //   success: true,
-    //   orderId,
-    //   orderShortId,
-    //   paymentUrl: hitPayData.url,
-    // };
+    return {
+      success: true,
+      orderId,
+      orderShortId,
+      paymentUrl: hitPayData.url,
+    };
   } catch (error) {
     console.error("Order creation failed:", error);
     return {
