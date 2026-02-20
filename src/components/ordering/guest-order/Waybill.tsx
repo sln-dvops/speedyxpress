@@ -81,6 +81,31 @@ export function Waybill({ orderDetails }: WaybillProps) {
         border: none !important;
         box-shadow: none !important;
       }
+        .waybill-scale {
+  width: 100mm;
+  height: 150mm;
+  transform-origin: top center;
+}
+
+@media (max-width: 640px) {
+  .waybill-scale {
+    transform: scale(0.9);
+  }
+
+  .preview-wrapper {
+    height: calc(150mm * 0.9);
+  }
+}
+
+@media (max-width: 400px) {
+  .waybill-scale {
+    transform: scale(0.7);
+  }
+
+  .preview-wrapper {
+    height: calc(150mm * 0.7);
+  }
+}
     }
   `;
 
@@ -243,7 +268,6 @@ export function Waybill({ orderDetails }: WaybillProps) {
                 className="preview-wrapper max-w-full flex justify-center"
                 style={{
                   width: "100mm",
-                  height: "150mm",
                   border: "none",
                   boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)",
                 }}
