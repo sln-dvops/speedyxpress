@@ -1,8 +1,11 @@
 // Determine the API endpoint based on the environment
+// export const HITPAY_API_ENDPOINT =
+//   process.env.NODE_ENV === "production"
+//     ? "https://api.hit-pay.com/v1/payment-requests"
+//     : "https://api.sandbox.hit-pay.com/v1/payment-requests"
+
 export const HITPAY_API_ENDPOINT =
-  process.env.NODE_ENV === "production"
-    ? "https://api.hit-pay.com/v1/payment-requests"
-    : "https://api.sandbox.hit-pay.com/v1/payment-requests"
+  "https://api.sandbox.hit-pay.com/v1/payment-requests";
 
 export const HITPAY_WEBHOOK_PATH = "/api/hitpay/webhook"
 // export const HITPAY_SUCCESS_PATH = "/api/payment/success"
