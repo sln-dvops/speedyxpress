@@ -1,27 +1,40 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { useReactToPrint } from "react-to-print"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Printer, ChevronDown, ChevronUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import type { OrderWithParcels, RecipientDetails } from "@/types/order"
-import { WaybillContent } from "./WaybillContent"
-import { cn } from "@/lib/utils"
+import { useState, useRef } from "react";
+import { useReactToPrint } from "react-to-print";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Printer,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { OrderWithParcels, RecipientDetails } from "@/types/order";
+import { WaybillContent } from "./WaybillContent";
+import { cn } from "@/lib/utils";
 
 interface WaybillProps {
-  orderDetails: OrderWithParcels
+  orderDetails: OrderWithParcels;
 }
 
 export function Waybill({ orderDetails }: WaybillProps) {
-  const [currentWaybillIndex, setCurrentWaybillIndex] = useState(0)
-  const [isExpanded, setIsExpanded] = useState(true)
-  const singleWaybillRef = useRef<HTMLDivElement>(null)
-  const allWaybillsRef = useRef<HTMLDivElement>(null)
+  const [currentWaybillIndex, setCurrentWaybillIndex] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const singleWaybillRef = useRef<HTMLDivElement>(null);
+  const allWaybillsRef = useRef<HTMLDivElement>(null);
 
-  const isBulkOrder = orderDetails.isBulkOrder && orderDetails.parcels.length > 1
-  const totalWaybills = isBulkOrder ? orderDetails.parcels.length : 1
+  const isBulkOrder =
+    orderDetails.isBulkOrder && orderDetails.parcels.length > 1;
+  const totalWaybills = isBulkOrder ? orderDetails.parcels.length : 1;
 
   // Define print styles to ensure consistency between preview and print
   const printStyles = `
@@ -69,50 +82,59 @@ export function Waybill({ orderDetails }: WaybillProps) {
         box-shadow: none !important;
       }
     }
-  `
+  `;
 
   // Handle printing a single waybill
   const handlePrintSingle = useReactToPrint({
     documentTitle: `Waybill-${orderDetails.orderNumber || ""}${isBulkOrder ? `-${currentWaybillIndex + 1}` : ""}`,
     contentRef: singleWaybillRef,
     pageStyle: printStyles,
-  })
+  });
 
   // Handle printing all waybills
   const handlePrintAll = useReactToPrint({
     documentTitle: `Waybills-${orderDetails.orderNumber || ""}`,
     contentRef: allWaybillsRef,
     pageStyle: printStyles,
-  })
+  });
 
   const handlePrevWaybill = () => {
-    setCurrentWaybillIndex((prev) => Math.max(0, prev - 1))
-  }
+    setCurrentWaybillIndex((prev) => Math.max(0, prev - 1));
+  };
 
   const handleNextWaybill = () => {
-    setCurrentWaybillIndex((prev) => Math.min(totalWaybills - 1, prev + 1))
-  }
+    setCurrentWaybillIndex((prev) => Math.min(totalWaybills - 1, prev + 1));
+  };
 
   const toggleExpanded = () => {
-    setIsExpanded((prev) => !prev)
-  }
+    setIsExpanded((prev) => !prev);
+  };
 
   // Get current recipient for bulk orders
   const getCurrentRecipient = (): RecipientDetails | null => {
-    if (!isBulkOrder || !orderDetails.recipients) return null
-    const recipient = orderDetails.recipients.find((r) => r.parcelIndex === currentWaybillIndex) || null
-    return recipient
-  }
+    if (!isBulkOrder || !orderDetails.recipients) return null;
+    const recipient =
+      orderDetails.recipients.find(
+        (r) => r.parcelIndex === currentWaybillIndex,
+      ) || null;
+    return recipient;
+  };
 
-  const currentRecipient = getCurrentRecipient()
-  const currentParcel = orderDetails.parcels[currentWaybillIndex] || orderDetails.parcels[0]
+  const currentRecipient = getCurrentRecipient();
+  const currentParcel =
+    orderDetails.parcels[currentWaybillIndex] || orderDetails.parcels[0];
 
   return (
-    <Card className="bg-white shadow-lg">
-      <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={toggleExpanded}>
-        <div className="flex justify-between items-center">
+    <Card className="bg-white shadow-lg rounded-lg">
+      <CardHeader
+        className="cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={toggleExpanded}
+      >
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
           <div className="flex items-center gap-2">
-            <CardTitle className="text-2xl font-bold text-black">Waybill</CardTitle>
+            <CardTitle className="text-2xl font-bold text-black">
+              Waybill
+            </CardTitle>
             {isExpanded ? (
               <ChevronUp className="h-5 w-5 text-gray-500" />
             ) : (
@@ -120,13 +142,18 @@ export function Waybill({ orderDetails }: WaybillProps) {
             )}
           </div>
           {isBulkOrder && (
-            <Badge variant="outline" className="bg-yellow-200 text-black border-black">
+            <Badge
+              variant="outline"
+              className="bg-yellow-200 text-black border-black"
+            >
               Bulk Order ({totalWaybills} Parcels)
             </Badge>
           )}
         </div>
         {isExpanded && (
-          <p className="text-black mt-2">Please print this shipping label and attach it to your parcel.</p>
+          <p className="text-black mt-2">
+            Please print this shipping label and attach it to your parcel.
+          </p>
         )}
       </CardHeader>
 
@@ -136,17 +163,23 @@ export function Waybill({ orderDetails }: WaybillProps) {
           isExpanded ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0",
         )}
       >
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <div className="space-y-6">
             {/* Print buttons */}
-            <div className="flex justify-end gap-2 print-hidden">
-              <Button onClick={() => handlePrintSingle()} className="bg-black hover:bg-black/90 text-yellow-400">
+            <div className="flex flex-col sm:flex-row sm:justify-end gap-2 print-hidden">
+              <Button
+                onClick={() => handlePrintSingle()}
+                className="w-full sm:w-auto bg-black hover:bg-black/90 text-yellow-400"
+              >
                 <Printer className="mr-2 h-4 w-4" />
                 Print Current Waybill
               </Button>
 
               {isBulkOrder && (
-                <Button onClick={() => handlePrintAll()} className="bg-black hover:bg-black/90 text-yellow-400">
+                <Button
+                  onClick={() => handlePrintAll()}
+                  className="w-full sm:w-auto bg-black hover:bg-black/90 text-yellow-400"
+                >
                   <Printer className="mr-2 h-4 w-4" />
                   Print All Waybills
                 </Button>
@@ -156,6 +189,7 @@ export function Waybill({ orderDetails }: WaybillProps) {
             {/* Navigation for bulk orders */}
             {isBulkOrder && (
               <div className="flex justify-between items-center print-hidden">
+                {/* <div className="flex flex-col sm:flex-row items-center justify-between gap-3 print-hidden"> */}
                 <Button
                   variant="outline"
                   size="sm"
@@ -183,8 +217,11 @@ export function Waybill({ orderDetails }: WaybillProps) {
             )}
 
             {/* Current waybill preview - this is what will be printed for single waybill */}
-            <div className="flex justify-center" ref={singleWaybillRef}>
-              <div
+            <div
+              className="flex justify-center overflow-hidden"
+              ref={singleWaybillRef}
+            >
+              {/* <div
                 className="preview-wrapper"
                 style={{
                   width: "100mm",
@@ -201,6 +238,24 @@ export function Waybill({ orderDetails }: WaybillProps) {
                   recipient={currentRecipient}
                   waybillIndex={currentWaybillIndex}
                 />
+              </div> */}
+              <div
+                className="preview-wrapper max-w-full flex justify-center"
+                style={{
+                  width: "100mm",
+                  height: "150mm",
+                  border: "none",
+                  boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)",
+                }}
+              >
+                <div className="waybill-scale">
+                  <WaybillContent
+                    orderDetails={orderDetails}
+                    parcel={currentParcel}
+                    recipient={currentRecipient}
+                    waybillIndex={currentWaybillIndex}
+                  />
+                </div>
               </div>
             </div>
 
@@ -213,7 +268,9 @@ export function Waybill({ orderDetails }: WaybillProps) {
                       <WaybillContent
                         orderDetails={orderDetails}
                         parcel={parcel}
-                        recipient={orderDetails.recipients?.find((r) => r.parcelIndex === index)}
+                        recipient={orderDetails.recipients?.find(
+                          (r) => r.parcelIndex === index,
+                        )}
                         waybillIndex={index}
                       />
                     </div>
@@ -232,26 +289,34 @@ export function Waybill({ orderDetails }: WaybillProps) {
             </div>
 
             {/* Print instructions */}
-            <div className="bg-yellow-100 p-4 rounded-lg print-hidden">
-              <h3 className="font-medium text-black mb-2">Printing Instructions:</h3>
+            <div className="bg-yellow-100 p-3 sm:p-4 rounded-lg print-hidden">
+              <h3 className="font-medium text-black mb-2">
+                Printing Instructions:
+              </h3>
               <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
                 <li>
-                  Click the &quot;Print {isBulkOrder ? `All Waybills (${totalWaybills})` : "Waybill"}&quot; button above
+                  Click the &quot;Print{" "}
+                  {isBulkOrder ? `All Waybills (${totalWaybills})` : "Waybill"}
+                  &quot; button above
                 </li>
                 <li>Each waybill will print on a separate page</li>
                 <li>Waybills are sized at 100mm × 150mm (portrait)</li>
-                <li>For best results, use label paper or cut to size after printing</li>
+                <li>
+                  For best results, use label paper or cut to size after
+                  printing
+                </li>
                 <li>Attach each printed waybill to its corresponding parcel</li>
               </ul>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="px-6 py-4 print-hidden">
+        <CardFooter className="px-4 sm:px-6 py-3 sm:py-4 print-hidden">
           <p className="text-sm text-gray-500">
-            Order #{orderDetails.orderNumber || ""} • {new Date().toLocaleDateString()}
+            Order #{orderDetails.orderNumber || ""} •{" "}
+            {new Date().toLocaleDateString()}
           </p>
         </CardFooter>
       </div>
     </Card>
-  )
+  );
 }
