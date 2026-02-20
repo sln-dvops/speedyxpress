@@ -14,12 +14,17 @@ import type {
   RecipientDetails,
 } from "@/types/order";
 import type { ParcelDimensions } from "@/types/pricing";
-import { determinePricingTier, calculateShippingPrice, calculateLocationSurcharge, calculateFullParcelPrice } from "@/types/pricing";
+import {
+  determinePricingTier,
+  calculateShippingPrice,
+  calculateLocationSurcharge,
+  calculateFullParcelPrice,
+} from "@/types/pricing";
 // Admin client (for writing to DB)
 const adminClient = createAdminClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
+  { auth: { persistSession: false } },
 );
 
 // Update the createOrder function to handle recipients properly
@@ -28,24 +33,23 @@ export async function createOrder(
   parcels: ParcelDimensions[],
   recipients?: RecipientDetails[],
 ) {
-// Get logged-in user using session client
-const cookieStore = await cookies();
+  // Get logged-in user using session client
+  const cookieStore = await cookies();
 
-const sessionClient = createServerClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  {
-    cookies: {
-      getAll: () => cookieStore.getAll(),
-      setAll: () => {},
+  const sessionClient = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: () => {},
+      },
     },
-  }
-);
+  );
 
-const {
-  data: { user },
-} = await sessionClient.auth.getUser();
-
+  const {
+    data: { user },
+  } = await sessionClient.auth.getUser();
 
   try {
     console.log("Creating order with the following details:");
@@ -71,23 +75,19 @@ const {
     }
 
     // Server-side price validation
-  const serverCalculatedPrice = parcels.reduce((total, parcel, index) => {
+    const serverCalculatedPrice = parcels.reduce((total, parcel, index) => {
+      const postalCode = orderDetails.isBulkOrder
+        ? recipients?.[index]?.postalCode
+        : orderDetails.recipientPostalCode;
 
-  const postalCode = orderDetails.isBulkOrder
-    ? recipients?.[index]?.postalCode
-    : orderDetails.recipientPostalCode
+      const parcelTotal = calculateFullParcelPrice(
+        parcel,
+        orderDetails.deliveryMethod,
+        postalCode,
+      );
 
-  const parcelTotal = calculateFullParcelPrice(
-    parcel,
-    orderDetails.deliveryMethod,
-    postalCode
-  )
-
-  return total + parcelTotal
-
-}, 0)
-
-
+      return total + parcelTotal;
+    }, 0);
 
     // Round to 2 decimal places for comparison
     const clientAmount = Math.round((orderDetails.amount || 0) * 100) / 100;
@@ -251,7 +251,12 @@ const {
 
     // Create HitPay payment request
     // Update the redirect URL to include the order ID
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    // const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    if (!process.env.NEXT_PUBLIC_BASE_URL) {
+      throw new Error("Base URL not configured");
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const redirectUrl = `${baseUrl}/order/${orderShortId}`;
 
     const hitPayRequestBody = createHitPayRequestBody({
@@ -287,12 +292,12 @@ const {
       };
     }
 
-//     if (!hitPayResponse.ok) {
-//       const errorText = await hitPayResponse.text();
-//       console.error("HitPay API error response:", errorText);
-//       throw new Error(`HitPay API error: ${hitPayResponse.status} ${hitPayResponse.statusText}
-// ${errorText}`);
-//     }
+    //     if (!hitPayResponse.ok) {
+    //       const errorText = await hitPayResponse.text();
+    //       console.error("HitPay API error response:", errorText);
+    //       throw new Error(`HitPay API error: ${hitPayResponse.status} ${hitPayResponse.statusText}
+    // ${errorText}`);
+    //     }
 
     const hitPayData: HitPayResponse = await hitPayResponse.json();
     console.log("HitPay API response:", JSON.stringify(hitPayData, null, 2));
