@@ -21,6 +21,7 @@ import {
   calculateLocationSurcharge,
   calculateFullParcelPrice,
 } from "@/types/pricing";
+import router from "next/router";
 
 type PaymentProps = {
   onPrevStep: () => void;
@@ -105,45 +106,36 @@ export function Payment({
 
   // Update the handlePayment function to ensure recipients are passed to createOrder
   const handlePayment = async () => {
-    setIsLoading(true);
-    setError(null);
+  setIsLoading(true);
+  setError(null);
 
-    try {
-      // Update order details with final price and delivery method
-      const updatedOrderDetails = {
-        ...orderDetails,
-        amount: totalPrice,
-        deliveryMethod: selectedDeliveryMethod,
-      };
+  try {
+    const updatedOrderDetails = {
+      ...orderDetails,
+      amount: totalPrice,
+      deliveryMethod: selectedDeliveryMethod,
+    };
 
-      // Extract recipient details for bulk orders
-      const recipients = orderDetails.recipients || [];
+    const recipients = orderDetails.recipients || [];
 
-      console.log("Sending recipients to createOrder:", recipients);
+    const result = await createOrder(
+      updatedOrderDetails,
+      selectedDimensions || [],
+      recipients,
+    );
 
-      // Create the order in the database and get payment URL
-      const result = await createOrder(
-        updatedOrderDetails,
-        selectedDimensions || [],
-        recipients,
-      );
-
-      if (result.success && result.paymentUrl) {
-        // Clear unsaved changes before redirecting
-        clearUnsavedChanges();
-
-        // Redirect to payment page
-        window.location.href = result.paymentUrl;
-      } else {
-        setError(result.error || "Failed to create order. Please try again.");
-      }
-    } catch (err) {
-      console.error("Payment error:", err);
-      setError("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (result.success && result.orderShortId) {
+      clearUnsavedChanges();
+      router.push(`/payment/${result.orderShortId}`);
+    } else {
+      setError(result.error || "Failed to create order.");
     }
-  };
+  } catch (err) {
+    setError("Unexpected error.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <Card className="bg-white shadow-lg">
