@@ -260,7 +260,7 @@ export function DetrackStatusTracker({
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-2xl font-bold text-black">Delivery Status</CardTitle>
-              <p className="text-black mt-2">Tracking information for your order</p>
+              <p className="text-black mt-2">Tracking  for your order</p>
             </div>
             <Button onClick={() => fetchStatus(currentParcelIndex)} variant="outline" size="sm">
               <RefreshCw className="h-4 w-4 mr-2" />

@@ -53,6 +53,20 @@ export async function getDetrackStatus(idParam: string): Promise<DetrackStatusRe
     // First, determine if this is an order ID or a parcel ID
     // Try to find it in the parcels table first
     // Always try parcel short_id first
+
+    // 1️⃣ If UUID, try parcel lookup first
+if (isValidUuid) {
+  const { data: parcelByUuid } = await supabase
+    .from("parcels")
+    .select("id, order_id, short_id")
+    .eq("id", idParam)
+    .maybeSingle()
+
+  if (parcelByUuid) {
+    console.log(`UUID ${idParam} belongs to parcel, using parcel workflow`)
+    return getDetrackStatusForParcel(parcelByUuid.id, parcelByUuid)
+  }
+}
 const { data: parcelData } = await supabase
   .from("parcels")
   .select("id, order_id, short_id")
