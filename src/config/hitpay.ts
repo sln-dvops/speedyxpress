@@ -11,7 +11,7 @@ export const HITPAY_WEBHOOK_PATH = "/api/hitpay/webhook"
 // export const HITPAY_SUCCESS_PATH = "/api/payment/success"
 export const HITPAY_SUCCESS_PATH = "/order"
 
-export function createHitPayRequestBody(orderDetails: any, trackingNumber?:string ) {
+export function createHitPayRequestBody(orderDetails: any) {
   // Get the base URL from environment variable
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://speedygo-booking.vercel.app/"
 
@@ -28,7 +28,7 @@ export function createHitPayRequestBody(orderDetails: any, trackingNumber?:strin
     reference_number: orderDetails.orderNumber,
     redirect_url: orderDetails.redirectUrl || `${baseUrl}${HITPAY_SUCCESS_PATH}?orderId=${orderDetails.orderNumber}`,
     webhook: `${process.env.NEXT_PUBLIC_BASE_URL}/api/hitpay/webhook`,
-    purpose: `Speedy Xpress Delivery - Order ${trackingNumber}`,
+    purpose: `Speedy Xpress Delivery Order`,
     // Address removed for privacy reasons
     allow_repeated_payments: false,
     send_email: true,
