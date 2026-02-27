@@ -31,10 +31,10 @@ export function OrderFlow({ user }: { user: any }) {
     {user ? (
       <>
         {/* Logged-in state */}
-        <p className="text-lg md:text-2xl text-black-700 text-center md:text-left">
+        <p className="text-xl md:text-2xl text-black-700 text-center md:text-left">
 
           Welcome back,{" "}
-          <span className="text-2xl text-black-700">
+          <span className="text-xl text-black-700">
             {user.user_metadata?.display_name ?? "User"}.
           </span>
         </p>
@@ -65,7 +65,7 @@ export function OrderFlow({ user }: { user: any }) {
     ) : (
       <>
         {/* Guest state */}
-        <p className="text-lg md:text-2xl text-black-700 text-center md:text-left">
+        <p className="text-xl md:text-2xl text-black-700 text-center md:text-left">
 
           Welcome to Speedy Express !
           

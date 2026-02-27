@@ -28,8 +28,95 @@ export interface LocationSurcharge {
   name: string
   amount: number
   postalSectors: number[]
+  postalCodes?: string[]
   areas?: string[]
 }
+
+export const TIER_3_POSTAL_CODES: string[] = [
+  "109680",
+  "109681",
+  "109682",
+  "118326",
+  "129817",
+  "139302",
+  "149373",
+  "149501",
+  "198834",
+  "248843",
+  "367833",
+  "397970",
+  "417902",
+  "465556",
+  "478937",
+  "478969",
+  "498760",
+  "498761",
+  "498802",
+  "498819",
+  "499611",
+  "506969",
+  "507087",
+  "507093",
+  "507709",
+  "508487",
+  "509863",
+  "534257",
+  "567754",
+  "596302",
+  "596472",
+  "619532",
+  "628398",
+  "628439",
+  "637559",
+  "638357",
+  "638361",
+  "638364",
+  "638501",
+  "639937",
+  "667988",
+  "669638",
+  "669642",
+  "669644",
+  "669645",
+  "669646",
+  "688248",
+  "688253",
+  "688255",
+  "688256",
+  "688257",
+  "688793",
+  "689953",
+  "689954",
+  "698956",
+  "708972",
+  "708976",
+  "718919",
+  "729753",
+  "729754",
+  "729756",
+  "738103",
+  "738203",
+  "738406",
+  "738700",
+  "757618",
+  "757621",
+  "757752",
+  "757753",
+  "757758",
+  "759945",
+  "759956",
+  "775900",
+  "778895",
+  "779914",
+  "797792",
+  "797809",
+  "818948",
+  "819116",
+  "819117",
+  "819118",
+  "819658"
+]
+
 export const LOCATION_SURCHARGES: LocationSurcharge[] = [
   {
     name: "Tier 1",
@@ -42,6 +129,12 @@ export const LOCATION_SURCHARGES: LocationSurcharge[] = [
     postalSectors: [9,69],
   },
 
+  {
+    name: "Tier 3",
+    amount: 15,
+    postalCodes: TIER_3_POSTAL_CODES,
+    postalSectors: []
+  }
 ]
 export function getPostalSector(postalCode: string): number | null {
   if (!postalCode || postalCode.length < 2) return null
@@ -50,11 +143,21 @@ export function getPostalSector(postalCode: string): number | null {
 }
 
 export function calculateLocationSurcharge(postalCode: string): number {
+  if (!postalCode || postalCode.length !== 6) return 0
+
+  // 1️⃣ Exact postal code match (Tier 3 first – most specific)
+  for (const tier of LOCATION_SURCHARGES) {
+    if (tier.postalCodes?.includes(postalCode)) {
+      return tier.amount
+    }
+  }
+
+  // 2️⃣ Fallback to sector-based logic
   const sector = getPostalSector(postalCode)
   if (sector === null) return 0
 
   for (const tier of LOCATION_SURCHARGES) {
-    if (tier.postalSectors.includes(sector)) {
+    if (tier.postalSectors?.includes(sector)) {
       return tier.amount
     }
   }
