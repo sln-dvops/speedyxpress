@@ -244,13 +244,13 @@ export function Payment({
           <label htmlFor="terms-checkbox" className="text-sm text-gray-600">
             I have read and agree to the{" "}
             <a
-              href={process.env.NEXT_PUBLIC_TOC_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              terms and conditions
-            </a>
+  href={process.env.NEXT_PUBLIC_TOC_URL || "/terms"}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-blue-600 hover:underline"
+>
+  terms and conditions
+</a>
           </label>
         </div>
 
