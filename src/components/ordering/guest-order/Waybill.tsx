@@ -28,7 +28,7 @@ interface WaybillProps {
 
 export function Waybill({ orderDetails }: WaybillProps) {
   const [currentWaybillIndex, setCurrentWaybillIndex] = useState(0);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const singleWaybillRef = useRef<HTMLDivElement>(null);
   const allWaybillsRef = useRef<HTMLDivElement>(null);
 

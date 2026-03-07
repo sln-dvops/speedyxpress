@@ -67,18 +67,18 @@ export function OrderFlow({ user }: { user: any }) {
         {/* Guest state */}
         <p className="text-xl md:text-2xl text-black-700 text-center md:text-left">
 
-          Welcome to Speedy Express !
+          Welcome to Speedy Xpress!
           
         </p>
 
         <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center">
-
+<a href="/signup" className="dashboard-link">
+                    Sign Up
+                  </a>
           <a href="/login" className="dashboard-link">
                     Log In
                   </a>
-          <a href="/signup" className="dashboard-link">
-                    Create an account
-                  </a>
+          
         </div>
       </>
     )}
