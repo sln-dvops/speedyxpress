@@ -133,7 +133,13 @@ export function Payment({
         clearUnsavedChanges();
 
         // Redirect to payment page
-        window.location.href = result.paymentUrl;
+        try {
+          const targetWindow = window.top ?? window;
+          targetWindow.location.href = result.paymentUrl;
+        } catch (e) {
+          // fallback if cross-origin access is blocked
+          window.location.href = result.paymentUrl;
+        }
       } else {
         setError(result.error || "Failed to create order. Please try again.");
       }
@@ -205,9 +211,7 @@ export function Payment({
 
             {totalLocationSurcharge > 0 && (
               <div className="flex justify-between items-center mt-2">
-                <p className="text-medium text-gray-600">
-                  Location Surcharge:
-                </p>
+                <p className="text-medium text-gray-600">Location Surcharge:</p>
                 <p className="text-medium font-bold text-green-600">
                   +${totalLocationSurcharge.toFixed(2)}
                 </p>
