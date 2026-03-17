@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import { getOrderDetails } from "@/app/actions/ordering/guest-order/getOrderDetails"
 import { OrderPageWrapper } from "@/components/ordering/OrderPageWrapper"
-
+import WixRedirectHandler from "@/components/ordering/guest-order/Wixhandler"
 export default async function OrderPage({
   params,
 }: {
@@ -19,6 +19,7 @@ export default async function OrderPage({
 
   return (
     <div className="min-h-screen bg-yellow-400 py-12">
+      <WixRedirectHandler orderId={orderId} />
       <div className="container mx-auto max-w-5xl px-4">
        <header className="mb-6">
           <div className="mb-8 flex items-center justify-between rounded-xl bg-white px-6 py-4 backdrop-blur-md shadow">

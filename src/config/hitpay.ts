@@ -23,7 +23,11 @@ export function createHitPayRequestBody(orderDetails: any) {
     name: orderDetails.senderName,
     phone: orderDetails.senderContactNumber,
     reference_number: orderDetails.orderNumber,
-    redirect_url: orderDetails.redirectUrl || `${baseUrl}${HITPAY_SUCCESS_PATH}?orderId=${orderDetails.orderNumber}`,
+    redirect_url: orderDetails.redirectUrl ??
+  (() => {
+    console.warn("⚠️ redirectUrl missing, using fallback");
+    return `${baseUrl}${HITPAY_SUCCESS_PATH}?orderId=${orderDetails.orderNumber}`;
+  })(),
     webhook: `${process.env.NEXT_PUBLIC_BASE_URL}/api/hitpay/webhook`,
     purpose: `Speedy Xpress Delivery Order`,
     // Address removed for privacy reasons
