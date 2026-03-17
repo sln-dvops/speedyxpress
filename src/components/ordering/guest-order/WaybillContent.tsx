@@ -40,6 +40,14 @@ export function WaybillContent({
 
   // Get the pricing tier from the parcel or recipient
   const pricingTier = parcel.pricingTier || recipient?.pricingTier || "T1";
+  // Get postal code
+const postalCode = recipient?.postalCode || orderDetails.recipientPostalCode || "";
+
+// First 2 digits of postal code
+const postalPrefix = postalCode.slice(0, 2);
+
+// Parcel weight
+const parcelWeight = parcel.weight || 0;
 
   return (
     <div className="waybill-content">
@@ -89,6 +97,16 @@ export function WaybillContent({
           </tr>
         </tbody>
       </table>
+
+      {/* Postal Sector + Weight */}
+<table className="waybill-table sector-weight">
+  <tbody>
+    <tr>
+      <td>{postalPrefix}</td>
+      <td>{parcelWeight} KG</td>
+    </tr>
+  </tbody>
+</table>
 
       {/* Third Row: Recipient Info */}
       <table className="waybill-table">

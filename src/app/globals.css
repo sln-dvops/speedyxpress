@@ -1007,10 +1007,14 @@ button:disabled {
   border: none;
   overflow: hidden;
 }
-
+.sector-weight td {
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+}
 table {
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: 5px;
   border-collapse: collapse;
 }
 
