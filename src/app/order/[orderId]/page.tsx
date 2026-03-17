@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { getOrderDetails } from "@/app/actions/ordering/guest-order/getOrderDetails"
 import { OrderPageWrapper } from "@/components/ordering/OrderPageWrapper"
+import { useEffect } from "react"
 
 export default async function OrderPage({
   params,
@@ -16,6 +17,17 @@ export default async function OrderPage({
   if (!orderDetails) {
     notFound()
   }
+
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const from = params.get("from");
+
+  if (from === "wix") {
+    setTimeout(() => {
+      window.location.href = "https://www.speedyxpress.co/booking?order=${orderId}";
+    }, 2000);
+  }
+}, []);
 
   return (
     <div className="min-h-screen bg-yellow-400 py-12">
