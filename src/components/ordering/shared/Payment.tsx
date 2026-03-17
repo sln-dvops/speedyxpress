@@ -138,7 +138,13 @@ export function Payment({
           targetWindow.location.href = result.paymentUrl;
         } catch (e) {
           // fallback if cross-origin access is blocked
-          window.location.href = result.paymentUrl;
+            try {
+  const targetWindow = window.top ?? window;
+  targetWindow.location.href = result.paymentUrl;
+} catch (e) {
+  // fallback if cross-origin access is blocked
+  window.location.href = result.paymentUrl;
+}
         }
       } else {
         setError(result.error || "Failed to create order. Please try again.");
