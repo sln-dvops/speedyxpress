@@ -124,6 +124,8 @@ export function DeliveryMethod({
   }
 
   return (
+    <div className="p-6 w-full flex justify-center">
+  <div className="w-full max-w-[1000px]">
     <Card className={`${styles.card} bg-white shadow-lg`}>
       <CardHeader>
         <CardTitle className={`text-2xl text-black ${styles.title}`}>
@@ -380,5 +382,7 @@ export function DeliveryMethod({
         </Button>
       </CardFooter>
     </Card>
+  </div>
+</div>
   );
 }

@@ -31,6 +31,8 @@ export function IndividualSendTo({ onPrevStep, onNextStep, formData, updateFormD
   }
 
   return (
+    <div className="p-6 w-full flex justify-center">
+  <div className="w-full max-w-[1000px]">
     <Card className="bg-white shadow-lg">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-black">Recipient Details</CardTitle>
@@ -55,6 +57,9 @@ export function IndividualSendTo({ onPrevStep, onNextStep, formData, updateFormD
         </Button>
       </CardFooter>
     </Card>
+   
+  </div>
+</div>
   )
 }
 
