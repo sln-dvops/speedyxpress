@@ -29,6 +29,8 @@ export function SendFrom({ onPrevStep, onNextStep, formData, updateFormData }: S
   }
 
   return (
+    <div className="p-6 w-full flex justify-center">
+  <div className="w-full max-w-[1000px]">
     <Card className="bg-white shadow-lg">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-black">Sender Details</CardTitle>
@@ -50,6 +52,9 @@ export function SendFrom({ onPrevStep, onNextStep, formData, updateFormData }: S
         </Button>
       </CardFooter>
     </Card>
+
+  </div>
+</div>
   )
 }
 

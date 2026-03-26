@@ -158,6 +158,8 @@ export function Payment({
   };
 
   return (
+    <div className="p-6 w-full flex justify-center">
+  <div className="w-full max-w-[1000px]">
     <Card className="bg-white shadow-lg">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-black">Payment</CardTitle>
@@ -288,5 +290,8 @@ export function Payment({
         </Button>
       </CardFooter>
     </Card>
+    
+  </div>
+</div>
   );
 }
