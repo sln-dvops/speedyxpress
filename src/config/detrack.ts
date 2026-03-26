@@ -23,6 +23,8 @@ export function convertOrderToDetrackJob(order: OrderWithParcels): DetrackJob {
   // Basic job data
   const job: DetrackJob = {
     type: DetrackJobType.DELIVERY,
+    "group_id": "699bd5fb1216402394cab205",
+    "group_name": "SpeedyGo!",
     // Use the order number (which should now be the short_id) as the DO number
     do_number: order.orderNumber || "",
     date: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
@@ -55,6 +57,8 @@ export function convertOrderToDetrackJob(order: OrderWithParcels): DetrackJob {
     // Seller/Shipper details - these worked
     sender_name: order.senderName,
     sender_phone_number: order.senderContactNumber,
+
+    customer: order.senderName,
 
     // Try different variations for sender address
     sender_address_1: order.senderAddress,

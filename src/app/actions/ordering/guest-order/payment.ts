@@ -251,6 +251,7 @@ const {
 
     // Create HitPay payment request
     // Update the redirect URL to include the order ID
+    
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const redirectUrl = `${baseUrl}/order/${orderShortId}?from=wix`;
 

@@ -256,7 +256,7 @@ export function Payment({
           <label htmlFor="terms-checkbox" className="text-sm text-gray-600">
             I have read and agree to the{" "}
             <a
-              href={process.env.NEXT_PUBLIC_TOC_URL}
+              href="https://cylkbkiicsipzjqvvxbf.supabase.co/storage/v1/object/public/Files/Orders/Price%20list%20and%20notice%20of%20use.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"

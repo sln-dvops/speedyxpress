@@ -51,6 +51,8 @@ export interface DetrackJobItem {
 export interface DetrackJob {
   id?: string
   type: DetrackJobType
+  group_id?:string
+  group_name?: string;
   do_number: string
   date: string
   start_date?: string
@@ -85,6 +87,8 @@ export interface DetrackJob {
   // Seller/Shipper details
   sender_name?: string
   sender_phone_number?: string
+
+  customer?: string;
 
   // Try different variations for sender address
   sender_address?: string

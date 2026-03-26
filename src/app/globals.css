@@ -995,3 +995,86 @@ button:disabled {
     margin-bottom: 8px;
   }
 }
+
+.waybill-content {
+  width: 100mm;
+  height: 150mm;
+  padding: 4mm;
+  margin: 0;
+  box-sizing: border-box;
+  background-color: white;
+  position: relative;
+  border: none;
+  overflow: hidden;
+}
+.sector-weight td {
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+table {
+  width: 100%;
+  margin-bottom: 5px;
+  border-collapse: collapse;
+}
+
+table td, table th {
+  border: 2px solid black;
+  padding: 5px;
+  text-align: left;
+}
+
+.table-header {
+  font-weight: bold;
+  text-align: center;
+}
+
+.table-header td {
+  font-size: 1rem;
+  text-align: center;
+}
+
+.flex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.w-1-2 {
+  width: 50%;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.text-lg {
+  font-size: 16px;
+}
+
+/* Add this to make the labels bold */
+.waybill-table td .label-bold {
+  font-weight: bold;
+}
+
+.waybill-scale {
+  width: 100mm;
+  height: 150mm;
+  transform-origin: top center;
+}
+
+@media (max-width: 640px) {
+  .waybill-scale {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 400px) {
+  .waybill-scale {
+    transform: scale(0.8);
+  }
+}

@@ -32,7 +32,7 @@ export default async function OrderPage({
             </div>
           </div>
         </header>
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 mb-6 md:mb-8">
           <OrderPageWrapper orderId={orderId} initialOrderDetails={orderDetails} />
         </div>
       </div>

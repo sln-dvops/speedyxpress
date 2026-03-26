@@ -260,7 +260,7 @@ export function DetrackStatusTracker({
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-2xl font-bold text-black">Delivery Status</CardTitle>
-              <p className="text-black mt-2">Tracking information for your order</p>
+              <p className="text-black mt-2">Tracking  for your order</p>
             </div>
             <Button onClick={() => fetchStatus(currentParcelIndex)} variant="outline" size="sm">
               <RefreshCw className="h-4 w-4 mr-2" />
@@ -282,12 +282,18 @@ export function DetrackStatusTracker({
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <div>
-            <CardTitle className="text-2xl font-bold text-black">Delivery Status</CardTitle>
+            <CardTitle className="text-lg sm:text-2xl font-bold text-black">Delivery Status</CardTitle>
             <p className="text-black mt-2">Tracking information for your order</p>
           </div>
-          <Button onClick={() => fetchStatus(currentParcelIndex)} variant="outline" size="sm" disabled={loading}>
+          <Button
+  onClick={() => fetchStatus(currentParcelIndex)}
+  variant="outline"
+  size="sm"
+  disabled={loading}
+  className="w-full sm:w-auto"
+>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
