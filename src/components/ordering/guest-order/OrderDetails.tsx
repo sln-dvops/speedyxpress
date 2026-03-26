@@ -52,10 +52,9 @@ export function OrderDetails({ orderId, initialOrderDetails }: OrderDetailsProps
       {loading && status !== "paid" && <div className="mb-4 text-sm text-gray-600">Checking payment status...</div>}
 
       <div>
-        <h2 className="text-2xl font-bold text-black mb-4">Thank you for your order!</h2>
+        <h2 className="text-xl font-bold text-black mb-4">Thank you for your order!</h2>
 
         <div className="mb-6">
-          <p className="text-black mb-2">Your order has been {status === "paid" ? "confirmed" : "received"}.</p>
           <p className="text-black mb-2">
             Tracking Number:{" "}
             <span className="font-semibold">
