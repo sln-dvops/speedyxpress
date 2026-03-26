@@ -149,9 +149,10 @@ export function CsvUploader({ setParcels, setRecipients }: CsvUploaderProps) {
 
 
   return (
+    <div className="w-full max-w-full overflow-hidden border border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
     <div className="border border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
       <h3 className="font-medium text-black mb-2">
-        Bulk Upload Parcels & Recipients
+        Multiple Parcels & Recipients
       </h3>
 
       <p className="text-sm text-gray-600 mb-4">
@@ -159,10 +160,10 @@ export function CsvUploader({ setParcels, setRecipients }: CsvUploaderProps) {
         Pricing is calculated based on the weight.
       </p>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
         <Button
-          variant="outline"
-          className="border-black text-black hover:bg-yellow-100"
+  variant="outline"
+  className="w-full sm:w-auto border-black text-black hover:bg-yellow-100"
           onClick={handleCsvButtonClick}
         >
           <Upload className="mr-2 h-4 w-4" />
@@ -178,8 +179,8 @@ export function CsvUploader({ setParcels, setRecipients }: CsvUploaderProps) {
         />
 
         <Button
-          variant="outline"
-          className="border-black text-black hover:bg-yellow-100"
+  variant="outline"
+  className="w-full sm:w-auto border-black text-black hover:bg-yellow-100"
           asChild
         >
           <a
@@ -233,6 +234,7 @@ export function CsvUploader({ setParcels, setRecipients }: CsvUploaderProps) {
           </AlertDescription>
         </Alert>
       )}
+    </div>
     </div>
   )
 }
