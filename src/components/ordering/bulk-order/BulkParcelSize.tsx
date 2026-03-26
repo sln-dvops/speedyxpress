@@ -108,6 +108,8 @@ export function ParcelDimensions({
   }
 
   return (
+    <div className="w-full px-4 sm:px-6 md:px-0 md:flex md:justify-center">
+  <div className="w-full md:max-w-[1000px]">
     <Card className="bg-white shadow-lg">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-black">
@@ -127,7 +129,7 @@ export function ParcelDimensions({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <div className="bg-yellow-100 p-4 rounded-lg">
+        <div className="mt-4 sm:mt-6 bg-yellow-100 p-4 rounded-lg">
           <p className="text-sm text-gray-700">
             Add multiple parcels by uploading a CSV file.
             Pricing is calculated based on the weight.
@@ -188,5 +190,6 @@ export function ParcelDimensions({
         </p>
       )}
     </Card>
-  )
+    </div>
+</div>  )
 }

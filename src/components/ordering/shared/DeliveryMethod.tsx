@@ -124,8 +124,8 @@ export function DeliveryMethod({
   }
 
   return (
-    <div className="p-6 w-full flex justify-center">
-  <div className="w-full max-w-[1000px]">
+    <div className="w-full px-4 sm:px-6 md:px-0 md:flex md:justify-center">
+  <div className="w-full md:max-w-[1000px]">
     <Card className={`${styles.card} bg-white shadow-lg`}>
       <CardHeader>
         <CardTitle className={`text-2xl text-black ${styles.title}`}>

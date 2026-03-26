@@ -158,8 +158,8 @@ export function Payment({
   };
 
   return (
-    <div className="p-6 w-full flex justify-center">
-  <div className="w-full max-w-[1000px]">
+    <div className="w-full px-4 sm:px-6 md:px-0 md:flex md:justify-center">
+  <div className="w-full md:max-w-[1000px]">
     <Card className="bg-white shadow-lg">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-black">Payment</CardTitle>
@@ -174,7 +174,7 @@ export function Payment({
       </CardHeader>
       <CardContent className="p-6 space-y-6">
         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-          <h3 className="text-xl font-bold text-black mb-4">Order Summary</h3>
+          <h3 className="text-xl font-bold text-black mb-4">Ordser Summary</h3>
 
           <div className="space-y-4">
             <div className="flex justify-between">

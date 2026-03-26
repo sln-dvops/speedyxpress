@@ -45,7 +45,8 @@ export default async function DashboardPage() {
       )
     `,
     )
-    .eq("orders.user_id", user.id);
+    .eq("orders.user_id", user.id)
+    .eq("orders.status", "paid")
 
   if (error) {
     throw new Error(error.message);
