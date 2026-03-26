@@ -74,7 +74,7 @@ export function DashboardUI({
 
             <div>
               <h2 className="text-lg md:text-xl font-semibold">
-                My Parcels
+                My Orders
               </h2>
               <p className="text-xs md:text-sm text-gray-500">
                 Welcome back, {user?.user_metadata?.display_name ?? "User"}

@@ -41,7 +41,7 @@ return (
     </header>
 
     {/* 🔥 Content */}
-    <main className="flex-1 p-4 sm:p-5 md:p-6">
+    <main className="flex-1 p-2 sm:p-2 md:p-6">
 
       <div className="max-w-4xl mx-auto">
 
