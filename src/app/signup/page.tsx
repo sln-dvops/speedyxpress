@@ -56,7 +56,7 @@ export default function SignupPage() {
       return
     }
 
-    router.push("/login")
+    router.push("/signup/success")
   }
 
   return (
