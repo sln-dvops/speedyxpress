@@ -77,7 +77,7 @@ export function DashboardUI({
                 My Orders
               </h2>
               <p className="text-xs md:text-sm text-gray-500">
-                Welcome back, {user?.user_metadata?.display_name ?? "User"}
+                Welcome, {user?.user_metadata?.display_name ?? "User"}
               </p>
             </div>
           </div>
@@ -99,7 +99,7 @@ export function DashboardUI({
               </p>
               <a
                 href="/booking"
-                className="inline-block bg-black text-white px-4 py-2 rounded-lg"
+                className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-lg hover:bg-yellow-500 transition"
               >
                 Create your first order
               </a>

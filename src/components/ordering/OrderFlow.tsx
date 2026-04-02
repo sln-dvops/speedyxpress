@@ -127,8 +127,8 @@ export function OrderFlow({ user }: { user: any }) {
               <h2 className="text-lg md:text-xl font-semibold">Create Order</h2>
 
               {user ? (
-                <p className="text-xs md:text-sm text-gray-500">
-                  Welcome back, {user.user_metadata?.display_name ?? "User"}
+                <p className="text-xs md:text-sm text-gray-600">
+                  Welcome, {user.user_metadata?.display_name ?? "User"} !
                 </p>
               ) : (
                 <p className="text-xs md:text-sm text-gray-500">
